@@ -1,0 +1,104 @@
+#webbox,
+#wb-loader,
+#wb-prev,
+#wb-next,
+#wb-prev span,
+#wb-next span,
+#wb-title,
+#wb-overlay { display: none; }
+#webbox {
+	z-index: 1001;
+	padding: 10px;
+	background-color: #fff;
+	font-family: Arial;
+	-moz-box-shadow: 0px 0px 10px #777;
+	-webkit-box-shadow: 0px 0px 10px #777;
+	box-shadow: 0px 0px 10px #777;
+	-moz-border-radius: 7px 0 7px 7px; /* FF1-3.6 */
+	-webkit-border-radius: 7px 0 7px 7px; /* Saf3-4, iOS 1-3.2, Android <1.6 */
+	border-radius: 7px 0 7px 7px; /* Opera 10.5, IE9, Saf5, Chrome, FF4, iOS 4, Android 2.1+ */
+}
+#webbox img { display: block; }
+#wb-close,
+#wb-prev span,
+#wb-next span {
+	font-size: 36px;
+	line-height: 1;
+	background-color: #fff;
+	color: #333;
+	text-decoration: none;
+}
+#wb-close:hover,
+#wb-prev span:hover,
+#wb-next span:hover { color: #9af; }
+#wb-close {
+	position: absolute;
+	z-index: 1003;
+	top: 0;
+	right: -43px;
+	padding: 3px 11px;
+	-moz-border-radius: 0 7px 7px 0; /* FF1-3.6 */
+	-webkit-border-radius: 0 7px 7px 0; /* Saf3-4, iOS 1-3.2, Android <1.6 */
+	border-radius: 0 7px 7px 0; /* Opera 10.5, IE9, Saf5, Chrome, FF4, iOS 4, Android 2.1+ */
+}
+#wb-prev,
+#wb-next { position: absolute; z-index: 1002; top: 0; width: 25%; height: 100%; }
+#wb-prev { left: 0; }
+#wb-next { right: 0; }
+#wb-prev.enabled:hover span,
+#wb-next.enabled:hover span { display: block; }
+#wb-prev span,
+#wb-next span { position: absolute; padding: 0px 12px 5px; line-height: 1; }
+#wb-prev span {
+	left: -43px;
+	-moz-border-radius: 7px 0 0 7px; /* FF1-3.6 */
+	-webkit-border-radius: 7px 0 0 7px; /* Saf3-4, iOS 1-3.2, Android <1.6 */
+	border-radius: 7px 0 0 7px; /* Opera 10.5, IE9, Saf5, Chrome, FF4, iOS 4, Android 2.1+ */
+}
+#wb-next span {
+	right: -43px;
+	-moz-border-radius: 0 7px 7px 0; /* FF1-3.6 */
+	-webkit-border-radius: 0 7px 7px 0; /* Saf3-4, iOS 1-3.2, Android <1.6 */
+	border-radius: 0 7px 7px 0; /* Opera 10.5, IE9, Saf5, Chrome, FF4, iOS 4, Android 2.1+ */
+}
+#wb-title {
+	position: absolute;
+	z-index: 1003;
+	bottom: 10px;
+	left: 10px;
+	background-color: rgba(0, 0, 0, 0.75);
+	color: #fff;
+	font-size: 12px;
+	line-height: 1.5;
+}
+#wb-title div { padding: 10px; }
+@-moz-keyframes spin {  
+	0% { -moz-transform: rotate(0deg); }
+	100% { -moz-transform: rotate(360deg); }
+}
+#wb-loader {
+	position: fixed;
+	z-index: 1004;
+	top: 47%;
+	left: 47%;
+	padding: 9px;
+	background-color: rgba(0, 0, 0, 0.5);
+	color: rgba(255, 255, 255, 0.75);
+	-moz-border-radius: 26px; /* FF1-3.6 */
+	-webkit-border-radius: 26px; /* Saf3-4, iOS 1-3.2, Android <1.6 */
+	border-radius: 26px; /* Opera 10.5, IE9, Saf5, Chrome, FF4, iOS 4, Android 2.1+ */
+}
+#wb-loader span {
+	font-size: 36px;
+	line-height: 1;
+	-moz-animation: spin 1s infinite linear;
+}
+#wb-overlay {
+	position: fixed;
+	z-index: 1000;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+	background-color: rgba(0,0,0,0.25);
+}
