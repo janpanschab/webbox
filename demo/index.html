@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Webbox demo</title>
+  <meta charset="utf-8" />
+  <link href="../jquery.webbox.css" rel="stylesheet" />
+</head>
+<body>
+  
+  <p id="global">
+    <button data-run="destroy">destroy</button>
+    <button data-run="init">init</button>
+    <button data-run="showLoader">show loader</button>
+    <button data-run="hideLoader">hide loader</button>
+  </p>
+  <p id="first">
+    execute on first image
+    <button data-run="open">open</button>
+    <button data-run="close" style="position: relative; z-index: 1010;">close</button>
+    <button data-run="next" style="position: relative; z-index: 1010;">next</button>
+    <button data-run="prev" style="position: relative; z-index: 1010;">previous</button>
+  </p>
+  <p>
+    <button id="open-second">open second image</button>
+    <button id="add-image">add image</button>
+  </p>
+  
+  <a href="img/61.jpg" data-wb-group="gallery" data-wb-options='{"title":"Dlouhý popis fotky hoodně moc. Lorem ipsum dolor sit amet. Praesent ac nisi lacus? Proin ut metus vel enim imperdiet congue eu id dolor. Ut dictum velit metus. <strong>Donec in eros nec sem ultricies adipiscing.</strong> Sed non tortor neque, at dapibus justo. Mauris condimentum neque eu libero ornare a faucibus quam rhoncus. <em>Donec a felis metus, dignissim ultrices metus.</em> Nunc condimentum feugiat sem vitae egestas."}'><img src="img/61_nahled.jpg" alt="image" width="180" height="101" /></a><br /><br /><br /><br />
+  <a href="img/63.jpg" data-wb-group="gallery" title="Popis fotografie"><img src="img/63_nahled.jpg" alt="image" width="168" height="120" /></a><br /><br /><br /><br />
+  <a href="img/64.png" data-wb-options='{"overlay":false}'><img src="img/64_nahled.png" alt="image" width="180" height="59" /></a><br /><br /><br /><br />
+  <a href="img/IMG_8868.jpg" data-wb-group="gallery"><img src="img/IMG_8868_nahled.jpg" alt="image" width="200" height="113" /></a><br /><br /><br /><br />
+  <a href="img/66.gif" data-wb-group="gallery"><img src="img/66_nahled.gif" alt="image" width="180" height="32" /></a>
+
+  <script src="js/jquery-1.6.1.min.js"></script>
+  <script src="../jquery.webbox.js"></script>
+  <script>
+    $(function() {
+      $('a').webbox({
+//        beforeOpen: function() { alert('beforeOpen') },
+//        open: function() { alert('open') },
+//        beforeClose: function() { alert('beforeClose') },
+//        close: function() { alert('close') }
+      });
+      
+      $('[data-run]', '#global').click(function() {
+        $('a').webbox($(this).data('run'));
+      });
+      
+      $('[data-run]', '#first').click(function() {
+        $('a:first').webbox($(this).data('run'));
+      });
+      
+      $('#open-second').click(function() {
+        $('a').webbox('open', $('a:eq(1)'));
+      });
+      
+      $('#add-image').click(function() {
+        $('body').prepend('<a href="img/IMG_4829.JPG" data-wb-group="gallery"><img src="img/IMG_4829_nahled.jpg" /></a>');
+      });
+    });
+  </script>
+
+</body>
+</html>
