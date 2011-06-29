@@ -2,6 +2,7 @@
 // example tests: https://github.com/jquery/qunit/blob/master/test/same.js
 
 $.fx.off = true;
+var timeout = 1000;
 
 test('create', function() {
   expect(11);
@@ -42,7 +43,7 @@ test('open by click on trigger', function() {
     ok($webbox.find('#wb-prev').is(':hidden'), '#wb-prev is hidden');
     
     start();
-  }, 1000);
+  }, timeout);
 });
 
 test('open by manual call (trigger not as argument)', function() {
@@ -60,7 +61,7 @@ test('open by manual call (trigger not as argument)', function() {
     ok($webbox.find('#wb-prev').is(':visible'), '#wb-prev is visible');
     
     start();
-  }, 1000);
+  }, timeout);
 });
 
 test('open by manual call (trigger as argument)', function() {
@@ -78,7 +79,27 @@ test('open by manual call (trigger as argument)', function() {
     ok($webbox.find('#wb-prev').is(':visible'), '#wb-prev is visible');
     
     start();
-  }, 1000);
+  }, timeout);
+});
+
+test('open added image to the DOM', function() {
+  stop();
+  expect(5);
+  $('a.webbox').webbox();
+  var $webbox = $('#webbox');
+  $('body').prepend('<a href="../demo/img/IMG_4829.JPG" data-wb-group="gallery" class="webbox" id="added-image"><img src="../demo/img/IMG_4829_nahled.jpg" /></a>');
+  $('#added-image').webbox('open');
+  
+  setTimeout(function() {
+    ok($webbox.is(':visible'), '#webbox is visible');
+    ok($webbox.find('#wb-title').is(':hidden'), '#wb-title is hidden');
+    ok($webbox.find('#wb-close').is(':visible'), '#wb-close is visible');
+    ok($webbox.find('#wb-next').is(':visible'), '#wb-next is visible');
+    ok($webbox.find('#wb-prev').is(':hidden'), '#wb-prev is hidden');
+    
+    start();
+    $('#added-image').remove();
+  }, timeout);
 });
 
 test('close by click on close button', function() {
@@ -95,8 +116,8 @@ test('close by click on close button', function() {
       ok($('#wb-loader').is(':hidden'), '#wb-loader is hidden');
       
       start();
-    }, 1000);
-  }, 1000);
+    }, timeout);
+  }, timeout);
 });
 
 test('close by shortcut', function() {
@@ -115,8 +136,8 @@ test('close by shortcut', function() {
       ok($('#wb-loader').is(':hidden'), '#wb-loader is hidden');
       
       start();
-    }, 1000);
-  }, 1000);
+    }, timeout);
+  }, timeout);
 });
 
 test('close by manual call', function() {
@@ -133,8 +154,8 @@ test('close by manual call', function() {
       ok($('#wb-loader').is(':hidden'), '#wb-loader is hidden');
       
       start();
-    }, 1000);
-  }, 1000);
+    }, timeout);
+  }, timeout);
 });
 
 test('next by click on next button', function() {
@@ -152,8 +173,8 @@ test('next by click on next button', function() {
       equals($('#webbox img').attr('src'), '../demo/img/63.jpg', 'image src is "../demo/img/63.jpg"');
       
       start();
-    }, 1000);
-  }, 1000);
+    }, timeout);
+  }, timeout);
 });
 
 test('is prev disabled when open first image', function() {
@@ -166,7 +187,7 @@ test('is prev disabled when open first image', function() {
     ok($('#wb-prev').is(':hidden'), '#wb-prev is hidden');
       
     start();
-  }, 1000);
+  }, timeout);
 });
 
 test('prev by click on prev button', function() {
@@ -184,8 +205,8 @@ test('prev by click on prev button', function() {
       equals($('#webbox img').attr('src'), '../demo/img/61.jpg', 'image src is "../demo/img/61.jpg"');
       
       start();
-    }, 1000);
-  }, 1000);
+    }, timeout);
+  }, timeout);
 });
 
 test('is next disabled when open last image', function() {
@@ -198,7 +219,7 @@ test('is next disabled when open last image', function() {
     ok($('#wb-next').is(':hidden'), '#wb-next is hidden');
 
     start();
-  }, 1000);
+  }, timeout);
 });
 
 test('prev by shortcut', function() {
@@ -218,8 +239,8 @@ test('prev by shortcut', function() {
       equals($('#webbox img').attr('src'), '../demo/img/63.jpg', 'image src is "../demo/img/63.jpg"');
       
       start();
-    }, 1000);
-  }, 1000);
+    }, timeout);
+  }, timeout);
 });
 
 test('next by shortcut', function() {
@@ -239,8 +260,8 @@ test('next by shortcut', function() {
       equals($('#webbox img').attr('src'), '../demo/img/66.gif', 'image src is "../demo/img/66.gif"');
       
       start();
-    }, 1000);
-  }, 1000);
+    }, timeout);
+  }, timeout);
 });
 
 test('prev by manual call', function() {
@@ -258,8 +279,8 @@ test('prev by manual call', function() {
       equals($('#webbox img').attr('src'), '../demo/img/63.jpg', 'image src is "../demo/img/63.jpg"');
       
       start();
-    }, 1000);
-  }, 1000);
+    }, timeout);
+  }, timeout);
 });
 
 test('next by manual call', function() {
@@ -277,6 +298,6 @@ test('next by manual call', function() {
       equals($('#webbox img').attr('src'), '../demo/img/66.gif', 'image src is "../demo/img/66.gif"');
       
       start();
-    }, 1000);
-  }, 1000);
+    }, timeout);
+  }, timeout);
 });

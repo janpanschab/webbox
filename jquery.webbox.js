@@ -339,6 +339,7 @@ bindWindowResize: function() {
         wb.img.fadeIn(500);
         wb.close.show();
         m.showTitle();
+        m.positionArrows();
       });
     });
   });
