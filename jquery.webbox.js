@@ -11,6 +11,7 @@ window.log = function(){
   var o,
       settings = {
         overlay: true,
+        overlayOpacity: 0.25,
         closeOnOverlayClick: true,
         position: 'absolute', // fixed, absolute
         margin: 30,
@@ -62,7 +63,7 @@ open: function(trigger) {
       .done(function() {
         m.hideLoader();
         if (wb.box.is(':visible')) { //listing
-          wb.img.appendTo(wb.box).hide();
+          wb.img.appendTo(wb.content).hide();
           dimensions = m.loadImageDimensions();
           dimensions = m.getMaxDimensions(dimensions);
           center = m.getCenter(dimensions);
@@ -76,9 +77,8 @@ open: function(trigger) {
             });
           });
         } else { //opening
-          wb.img.appendTo(wb.box);
+          wb.img.appendTo(wb.content);
           wb.box.fadeIn(500, function() {
-            m.bindListing();
             m.setListing();
             m.bindShortcuts();
             m.bindWindowResize();
@@ -86,7 +86,7 @@ open: function(trigger) {
             o.open();
           });
           if (o.overlay) {
-            wb.overlay.fadeIn(500);
+            wb.overlay.fadeTo(500, o.overlayOpacity);
           }
           dimensions = m.loadImageDimensions();
           dimensions = m.getMaxDimensions(dimensions);
@@ -94,6 +94,7 @@ open: function(trigger) {
           m.setDimensions(wb.img, dimensions);
           center = m.getCenter(dimensions);
           m.setCenter(wb.box, center);
+          wb.img.css('zIndex', 2000);
         }
         wb.isOpen = true;
       })
@@ -233,7 +234,6 @@ hideImage: function() {
 },
 showLoader: function() {
   wb.loader.show();
-  wb.loader.show();
   var dimensions = m.getDimensions(wb.loader),
       center = m.getCenter(dimensions);
   m.setCenter(wb.loader, center);
@@ -299,7 +299,6 @@ show: function(index) {
 },
 bindListing: function() {
   wb.prev.add(wb.next).bind('click.wb', function(e) {
-    e.preventDefault();
     var showIndex = this === wb.prev.get(0) ? group.index - 1 : group.index + 1;
     o = storeOptions;
     m.show(showIndex);
@@ -316,7 +315,6 @@ bindOpen: function() {
 },
 bindClose: function() {
   wb.close.bind('click.wb', function(e) {
-    e.preventDefault();
     m.close();
   });
   if (o.closeOnOverlayClick) {
@@ -348,63 +346,16 @@ unbindWindowResize: function() {
   $(window).unbind('.wb');
 },
 create: function() {
-  $('<div />', {
-    id: 'webbox'
-  })
-    .append(
-      $('<a />', {
-        id: 'wb-close',
-        href: '#',
-        text: '×'
-      })
-    ).append(
-      $('<a />', {
-        id: 'wb-prev',
-        'class': 'disabled',
-        href: '#'
-      })
-        .append(
-          $('<span />', {
-            text: '«'
-          })
-        )
-    ).append(
-      $('<a />', {
-        id: 'wb-next',
-        'class': 'disabled',
-        href: '#'
-      })
-        .append(
-          $('<span />', {
-            text: '»'
-          })
-        )
-    ).append(
-      $('<div />', {
-        id: 'wb-title'
-      }).append(
-        $('<div />')
-      )
-    )
-    .after(
-      $('<div />', {
-        id: 'wb-loader'
-      }).append(
-        $('<span />', {
-          text: '\u2605' //\u21c6
-        })
-      )
-    ).appendTo('body');
+  $('<div id="webbox"><div id="wb-content"></div><div id="wb-close">×</div><div id="wb-prev" class="disabled"><span>«</span></div><div id="wb-next" class="disabled"><span>»</span></div><div id="wb-title"><div /></div></div><div id="wb-loader"><span>\u2605</span></div>').appendTo('body');
   wb.box = $('#webbox');
   wb.close = $('#wb-close');
   wb.prev = $('#wb-prev');
   wb.next = $('#wb-next');
+  wb.content = $('#wb-content');
   wb.title = $('#wb-title');
   wb.loader = $('#wb-loader');
   if (o.overlay) {
-    $('<div />', {
-      id: 'wb-overlay'
-    }).appendTo('body');
+    $('<div id="wb-overlay" />').appendTo('body');
     wb.overlay = $('#wb-overlay');
   }
   wb.box.css('position', o.position);
