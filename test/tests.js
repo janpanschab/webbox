@@ -34,7 +34,6 @@ test('destroy', function() {
 module('click events');
 
 test('open by click on trigger', function() {
-  console.log('test1');
   stop();
   expect(5);
   $('a.webbox').webbox().filter(':first').click();
@@ -52,7 +51,6 @@ test('open by click on trigger', function() {
 });
 
 test('prev by click on prev button', function() {
-  console.log('test2');
   stop();
   expect(5);
   $('a.webbox').webbox();
@@ -73,7 +71,6 @@ test('prev by click on prev button', function() {
 });
 
 test('next by click on next button', function() {
-  console.log('test3');
   stop();
   expect(5);
   $('a.webbox').webbox();
@@ -95,7 +92,6 @@ test('next by click on next button', function() {
 });
 
 test('close by click on close button', function() {
-  console.log('test4');
   stop();
   expect(3);
   $('a.webbox').webbox();
