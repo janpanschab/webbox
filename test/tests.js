@@ -2,7 +2,11 @@
 // example tests: https://github.com/jquery/qunit/blob/master/test/same.js
 
 $.fx.off = true;
-var timeout = 1000;
+var timeout = 1500;
+QUnit.testStart = function(name) {
+  log(name.name);
+  log($('a.webbox'));
+};
 
 module('core');
 
@@ -149,11 +153,12 @@ test('open by manual call (trigger as argument)', function() {
 
 test('prev by manual call', function() {
   stop();
-  expect(4);
+  expect(5);
   $('a.webbox').webbox();
   $('a.webbox').webbox('open', $('a.webbox:eq(3)'));
   
   setTimeout(function() {
+    equals($('#webbox img').attr('src'), '../demo/img/IMG_8868.jpg', 'image src is "../demo/img/IMG_8868.jpg"');
     $('a.webbox').webbox('prev');
     setTimeout(function() {
       ok($('#webbox').is(':visible'), '#webbox is visible');

@@ -14,12 +14,13 @@ window.log = function(){
         overlayOpacity: 0.25,
         closeOnOverlayClick: true,
         position: 'absolute', // fixed, absolute
-        margin: 30,
+        margin: 50,
         beforeOpen: function() {},
         open: function() {},
         beforeClose: function() {},
         close: function() {}
       },
+      singleOptions = ['wb-position','wb-overlay'],
       storeOptions,
       $body = $('body'),
       wb = {},
@@ -52,11 +53,21 @@ open: function(trigger) {
     }
     var url = wb.trigger.attr('href'),
         dataOptions = wb.trigger.data('wb-options'),
+        singleDataOptions = {},
         dimensions,
         center;
-    if (dataOptions) {
+    if (dataOptions) { // extend options with data from wb-options
       o = $.extend({}, o, dataOptions);
     }
+    $.each(singleOptions, function(i, val) {
+      var dataO = wb.trigger.data(val),
+          key = val.replace('wb-', '');
+      if (dataO !== undefined) {
+        singleDataOptions[key] = dataO;
+      }
+    });
+    o = $.extend({}, o, singleDataOptions) // extend options with data from single data options
+    wb.box.css('position', o.position);
     o.beforeOpen();
     m.showLoader();
     $.when(m.loadImage(url))
@@ -358,7 +369,6 @@ create: function() {
     $('<div id="wb-overlay" />').appendTo('body');
     wb.overlay = $('#wb-overlay');
   }
-  wb.box.css('position', o.position);
   wb.isCreated = true;
 },
 destroy: function() {
