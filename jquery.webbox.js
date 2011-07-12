@@ -105,7 +105,6 @@ open: function(trigger) {
           m.setDimensions(wb.img, dimensions);
           center = m.getCenter(dimensions);
           m.setCenter(wb.box, center);
-          wb.img.css('zIndex', 2000);
         }
         wb.isOpen = true;
       })
@@ -126,7 +125,6 @@ close: function() {
     wb.box.add(wb.overlay).fadeOut(500);
     m.disable(wb.prev);
     m.disable(wb.next);
-    m.unbindListing();
     m.hideTitle();
     m.unbindShortcuts();
     o = storeOptions;
@@ -262,7 +260,7 @@ bindShortcuts: function() {
   });
 },
 unbindShortcuts: function() {
-  $(document).unbind('.wb');
+  $(document).unbind('keydown.wb');
 },
 setListing: function() {
   group.name = wb.trigger.data('wbGroup') || false;
@@ -315,9 +313,6 @@ bindListing: function() {
     m.show(showIndex);
   });
 },
-unbindListing: function() {
-  wb.prev.add(wb.next).unbind('.wb');
-},
 bindOpen: function() {
   $body.delegate(wb.self.selector +':not(#wb-close, #wb-prev, #wb-next)', 'click.wb', function(e) {
     e.preventDefault();
@@ -328,11 +323,14 @@ bindClose: function() {
   wb.close.bind('click.wb', function(e) {
     m.close();
   });
-  if (o.closeOnOverlayClick) {
-    wb.overlay.bind('click.wb', function() {
+  m.bindCloseOnOverlayClick();
+},
+bindCloseOnOverlayClick: function() {
+  wb.overlay.bind('click.wb', function() {
+    if (o.closeOnOverlayClick) {
       m.close();
-    });
-  }
+    }
+  });
 },
 bindWindowResize: function() {
   var $window = $(window);
@@ -354,7 +352,7 @@ bindWindowResize: function() {
   });
 },
 unbindWindowResize: function() {
-  $(window).unbind('.wb');
+  $(window).unbind('resize.wb');
 },
 create: function() {
   $('<div id="webbox"><div id="wb-content"></div><div id="wb-close">×</div><div id="wb-prev" class="disabled"><span>«</span></div><div id="wb-next" class="disabled"><span>»</span></div><div id="wb-title"><div /></div></div><div id="wb-loader"><span>\u2605</span></div>').appendTo('body');
@@ -374,7 +372,7 @@ create: function() {
 destroy: function() {
   wb.box.add(wb.overlay).add(wb.loader).remove();
   $body.undelegate('.wb');
-  $(document).unbind('.wb');
+  $(window).unbind('.wb');
   m.unbindWindowResize();
   wb.isCreated = false;
   wb.isOpen = false;

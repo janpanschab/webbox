@@ -4,8 +4,8 @@
 $.fx.off = true;
 var timeout = 1500;
 QUnit.testStart = function(name) {
-  log(name.name);
-  log($('a.webbox'));
+  //log(name.name);
+  //log($('a.webbox'));
 };
 
 module('core');
@@ -319,5 +319,70 @@ test('is next disabled when open last image', function() {
     ok($('#wb-next').is(':hidden'), '#wb-next is hidden');
 
     start();
+  }, timeout);
+});
+
+module('options');
+
+test('overlay visible', function() {
+  stop();
+  expect(1);
+  $('a.webbox').webbox();
+  $('a.webbox').webbox('open', $('a.webbox:eq(0)'));
+  
+  setTimeout(function() {
+    ok($('#wb-overlay').is(':visible'), '#wb-overlay is visible');
+      
+    start();
+  }, timeout);
+});
+
+test('overlay hidden', function() {
+  stop();
+  expect(1);
+  $('a.webbox').webbox();
+  $('a.webbox').webbox('open', $('a.webbox:eq(2)'));
+  
+  setTimeout(function() {
+    ok($('#wb-overlay').is(':hidden'), '#wb-overlay is hidden');
+      
+    start();
+  }, timeout);
+});
+
+test('closeOnOverlayClick', function() {
+  stop();
+  expect(1);
+  $('a.webbox').webbox();
+  var $webbox = $('#webbox');
+  $('a.webbox').webbox('open', $('a.webbox:eq(3)'));
+  
+  setTimeout(function() {
+    $('#wb-overlay').click();
+    setTimeout(function() {
+      ok($webbox.is(':visible'), '#webbox is visible');
+
+      start();
+    }, timeout);
+  }, timeout);
+});
+
+test('position', function() {
+  stop();
+  expect(4);
+  $('a.webbox').webbox();
+  var $webbox = $('#webbox');
+  $('a.webbox:eq(0)').webbox('open');
+  
+  setTimeout(function() {
+    equals($('img', $webbox).attr('src'), '../demo/img/61.jpg', 'image src is "../demo/img/61.jpg"');
+    equals($webbox.css('position'), 'absolute', '#webbox has position absolute');
+    $('#wb-next').click();
+    setTimeout(function() {
+      equals($('img', $webbox).attr('src'), '../demo/img/63.jpg', 'image src is "../demo/img/63.jpg"');
+      equals($webbox.css('position'), 'fixed', '#webbox has position fixed');
+
+      start();
+    }, timeout);
   }, timeout);
 });
