@@ -70,7 +70,7 @@ open: function(trigger) {
       }
     });
     o = $.extend({}, o, singleDataOptions) // extend options with data from single data options
-    wb.box.css('position', o.position);
+    wb.box.css('position', 'absolute');
     o.beforeOpen();
     m.showLoader();
     $.when(m.loadImage(url))
@@ -80,8 +80,9 @@ open: function(trigger) {
           wb.img.appendTo(wb.content).hide();
           dimensions = m.loadImageDimensions();
           dimensions = m.getMaxDimensions(dimensions);
-          center = m.getCenter(dimensions, o.position === 'fixed');
+          center = m.getCenter(dimensions);
           $.when(m.resizeBox(dimensions, center)).then(function() {
+            m.setFixedPosition(dimensions);
             m.setDimensions(wb.img, dimensions);
             wb.img.fadeIn(500, function() {
               m.setListing();
@@ -106,8 +107,9 @@ open: function(trigger) {
           dimensions = m.getMaxDimensions(dimensions);
           m.setDimensions(wb.box, dimensions);
           m.setDimensions(wb.img, dimensions);
-          center = m.getCenter(dimensions, o.position === 'fixed');
+          center = m.getCenter(dimensions);
           m.setCenter(wb.box, center);
+          m.setFixedPosition(dimensions);
         }
         wb.isOpen = true;
       })
@@ -145,6 +147,18 @@ prev: function() {
     o = storeOptions;
     m.show(group.index - 1);
   }
+},
+setFixedPosition: function(dimensions) {
+  if (o.position === 'fixed') {
+    var center = m.getCenter(dimensions, true);
+    m.setCenter(wb.box, center);
+    wb.box.css('position', 'fixed');
+  }
+},
+setAbsolutePosition: function(dimensions) {
+  var center = m.getCenter(dimensions);
+  m.setCenter(wb.box, center);
+  wb.box.css('position', 'absolute');
 },
 showTitle: function() {
   var title = o.title || wb.trigger.attr('title'),
@@ -320,6 +334,8 @@ show: function(index) {
   m.hideTitle();
   $.when(m.hideImage())
     .then(function() {
+      var dimensions = m.getDimensions(wb.box);
+      m.setAbsolutePosition(dimensions);
       wb.img.remove();
       m.open(group.triggers.eq(index));
     });
