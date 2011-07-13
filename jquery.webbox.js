@@ -15,6 +15,7 @@ window.log = function(){
         closeOnOverlayClick: true,
         position: 'absolute', // fixed, absolute
         margin: 50,
+        loaderDelay: 250,
         beforeOpen: function() {},
         open: function() {},
         beforeClose: function() {},
@@ -22,6 +23,8 @@ window.log = function(){
       },
       singleOptions = ['wb-position','wb-overlay'],
       storeOptions,
+      loaderTimeout,
+      cache = [],
       $body = $('body'),
       wb = {},
       group = {},
@@ -77,7 +80,7 @@ open: function(trigger) {
           wb.img.appendTo(wb.content).hide();
           dimensions = m.loadImageDimensions();
           dimensions = m.getMaxDimensions(dimensions);
-          center = m.getCenter(dimensions);
+          center = m.getCenter(dimensions, o.position === 'fixed');
           $.when(m.resizeBox(dimensions, center)).then(function() {
             m.setDimensions(wb.img, dimensions);
             wb.img.fadeIn(500, function() {
@@ -103,7 +106,7 @@ open: function(trigger) {
           dimensions = m.getMaxDimensions(dimensions);
           m.setDimensions(wb.box, dimensions);
           m.setDimensions(wb.img, dimensions);
-          center = m.getCenter(dimensions);
+          center = m.getCenter(dimensions, o.position === 'fixed');
           m.setCenter(wb.box, center);
         }
         wb.isOpen = true;
@@ -149,10 +152,12 @@ showTitle: function() {
       width = dimensions[0];
   if (title) {
     wb.title.width(width).show().children().html(title);
+    wb.box.attr('aria-labelledby', 'wb-title-aria');
   }
 },
 hideTitle: function() {
   wb.title.hide();
+  wb.box.removeAttr('aria-labelledby');
 },
 resizeBox: function(dimensions, center) {
   var dfd = $.Deferred();
@@ -211,9 +216,9 @@ getViewport: function(margin) {
 getScroll: function() {
   return [ $(document).scrollTop(), $(document).scrollLeft() ];
 },
-getCenter: function(dimensions) {
+getCenter: function(dimensions, fixed) {
   var viewport = m.getViewport(),
-      scroll = m.getScroll(),
+      scroll = fixed ? [0,0] : m.getScroll(),
       top = ((viewport[1] - dimensions[1]) / 2) + scroll[0],
       left = ((viewport[0] - dimensions[0]) / 2) + scroll[1];
   return [
@@ -229,7 +234,7 @@ setCenter: function($el, center) {
 },
 loadImage: function(url) {
   var dfd = $.Deferred();
-  wb.img = $('<img />');
+  wb.img = $('<img role="img" />');
   wb.img
     .load(dfd.resolve)
     .error(dfd.reject)
@@ -242,12 +247,15 @@ hideImage: function() {
   return dfd.promise();
 },
 showLoader: function() {
-  wb.loader.show();
-  var dimensions = m.getDimensions(wb.loader),
-      center = m.getCenter(dimensions);
-  m.setCenter(wb.loader, center);
+  loaderDelay = setTimeout(function() {
+    wb.loader.show();
+    var dimensions = m.getDimensions(wb.loader),
+        center = m.getCenter(dimensions, true);
+    m.setCenter(wb.loader, center);
+  }, o.loaderDelay);
 },
 hideLoader: function() {
+  clearTimeout(loaderDelay);
   wb.loader.hide();
 },
 bindShortcuts: function() {
@@ -271,19 +279,29 @@ setListing: function() {
     if (group.size > 1) {
       if (group.index !== 0) {
         m.enable(wb.prev);
+        m.preload(group.triggers.eq(group.index - 1));
       }
       if (group.index !== group.size - 1) {
         m.enable(wb.next);
+        m.preload(group.triggers.eq(group.index + 1));
       }
     }
     m.positionArrows();
   }
 },
+preload: function($trigger) {
+  var src = $trigger.attr('href');
+  if ($.inArray(src, cache) === -1) {
+    var img = document.createElement('img');
+    img.src = src;
+    cache.push(src);
+  };
+},
 enable: function($el) {
-  $el.removeClass('disabled').addClass('enabled').show();
+  $el.removeClass('disabled').addClass('enabled').attr('aria-disabled', false).show();
 },
 disable: function($el) {
-  $el.removeClass('enabled').addClass('disabled').hide();
+  $el.removeClass('enabled').addClass('disabled').attr('aria-disabled', true).hide();
 },
 positionArrows: function() {
   var $prev = wb.prev.children('span'),
@@ -340,7 +358,7 @@ bindWindowResize: function() {
     $.when(m.hideImage()).then(function() {
       var dimensions = m.loadImageDimensions();
       dimensions = m.getMaxDimensions(dimensions);
-      var center = m.getCenter(dimensions);
+      var center = m.getCenter(dimensions, o.position === 'fixed');
       $.when(m.resizeBox(dimensions, center)).then(function() {
         m.setDimensions(wb.img, dimensions);
         wb.img.fadeIn(500);
@@ -355,7 +373,7 @@ unbindWindowResize: function() {
   $(window).unbind('resize.wb');
 },
 create: function() {
-  $('<div id="webbox"><div id="wb-content"></div><div id="wb-close">×</div><div id="wb-prev" class="disabled"><span>«</span></div><div id="wb-next" class="disabled"><span>»</span></div><div id="wb-title"><div /></div></div><div id="wb-loader"><span>\u2605</span></div>').appendTo('body');
+  $('<div id="webbox" role="dialog"><div id="wb-content"></div><div id="wb-close" role="button">×</div><div id="wb-prev" class="disabled" role="button" aria-disabled="true"><span>«</span></div><div id="wb-next" class="disabled" role="button" aria-disabled="true"><span>»</span></div><div id="wb-title"><div id="wb-title-aria" /></div></div><div id="wb-loader"><span>\u2605</span></div>').appendTo('body');
   wb.box = $('#webbox');
   wb.close = $('#wb-close');
   wb.prev = $('#wb-prev');
