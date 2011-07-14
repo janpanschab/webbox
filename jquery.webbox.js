@@ -62,13 +62,7 @@ open: function(trigger) {
     if (dataOptions) { // extend options with data from wb-options
       o = $.extend({}, o, dataOptions);
     }
-    $.each(singleOptions, function(i, val) {
-      var dataO = wb.trigger.data(val),
-          key = val.replace('wb-', '');
-      if (dataO !== undefined) {
-        singleDataOptions[key] = dataO;
-      }
-    });
+    singleDataOptions = m.getSingleDataOptions();
     o = $.extend({}, o, singleDataOptions) // extend options with data from single data options
     wb.box.css('position', 'absolute');
     o.beforeOpen();
@@ -316,6 +310,17 @@ enable: function($el) {
 },
 disable: function($el) {
   $el.removeClass('enabled').addClass('disabled').attr('aria-disabled', true).hide();
+},
+getSingleDataOptions: function() {
+  var SDO = [];
+  $.each(singleOptions, function(i, val) {
+    var dataO = wb.trigger.data(val),
+        key = val.replace('wb-', '');
+    if (dataO !== undefined) {
+      SDO[key] = dataO;
+    }
+  });
+  return SDO;
 },
 positionArrows: function() {
   var $prev = wb.prev.children('span'),
