@@ -120,7 +120,7 @@ test('open by manual call (trigger not as argument)', function() {
   expect(5);
   $('a.webbox').webbox();
   var $webbox = $('#webbox');
-  $('a.webbox:last').webbox('open');
+  $('a.webbox:eq(4)').webbox('open');
   
   setTimeout(function() {
     ok($webbox.is(':visible'), '#webbox is visible');
@@ -384,5 +384,22 @@ test('position', function() {
 
       start();
     }, timeout);
+  }, timeout);
+});
+
+
+module('content');
+
+test('open content', function() {
+  stop();
+  expect(1);
+  $('a.webbox').webbox();
+  var $webbox = $('#webbox');
+  $('a.webbox').webbox('open', $('a.webbox:eq(5)'));
+  
+  setTimeout(function() {
+    ok($webbox.is(':visible'), '#webbox is visible');
+    
+    start();
   }, timeout);
 });
