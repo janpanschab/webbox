@@ -23,10 +23,12 @@ window.log = function(){
       },
       singleOptions = ['wb-position','wb-overlay'],
       storeOptions,
-      loaderTimeout,
       cache = [],
       $body = $('body'),
-      wb = {},
+      wb = {
+        IMAGE: 'image',
+        AJAX: 'ajax'
+      },
       group = {},
       m = {
         
@@ -56,9 +58,7 @@ open: function(trigger) {
     }
     var url = wb.trigger.attr('href'),
         dataOptions = wb.trigger.data('wb-options'),
-        singleDataOptions = {},
-        dimensions,
-        center;
+        singleDataOptions = {};
     if (dataOptions) { // extend options with data from wb-options
       o = $.extend({}, o, dataOptions);
     }
@@ -67,61 +67,26 @@ open: function(trigger) {
     wb.box.css('position', 'absolute');
     o.beforeOpen();
     m.showLoader();
-    $.when(m.loadImage(url))
-      .done(function() {
-        m.hideLoader();
-        if (wb.box.is(':visible')) { //listing
-          wb.img.appendTo(wb.content).hide();
-          dimensions = m.loadImageDimensions();
-          dimensions = m.getMaxDimensions(dimensions);
-          center = m.getCenter(dimensions);
-          $.when(m.resizeBox(dimensions, center)).then(function() {
-            m.setFixedPosition(dimensions);
-            m.setDimensions(wb.img, dimensions);
-            wb.img.fadeIn(500, function() {
-              m.setListing();
-              wb.close.show();
-              m.showTitle();
-              o.open();
-            });
-          });
-        } else { //opening
-          wb.img.appendTo(wb.content);
-          wb.box.fadeIn(500, function() {
-            m.setListing();
-            m.bindShortcuts();
-            m.bindWindowResize();
-            m.showTitle();
-            o.open();
-          });
-          if (o.overlay) {
-            wb.overlay.fadeTo(500, o.overlayOpacity);
-          }
-          dimensions = m.loadImageDimensions();
-          dimensions = m.getMaxDimensions(dimensions);
-          m.setDimensions(wb.box, dimensions);
-          m.setDimensions(wb.img, dimensions);
-          center = m.getCenter(dimensions);
-          m.setCenter(wb.box, center);
-          m.setFixedPosition(dimensions);
-        }
-        wb.isOpen = true;
-      })
-      .fail(function() {
-        m.hideLoader();
-        $.error('error loading image');
-      });
+    // switch open by content type
+    wb.contentType = m.getContentType(url);
+    switch (wb.contentType) {
+      case wb.AJAX: m.openAjax(url); break;
+      default: m.openImage(url);
+    }
   }
 },
 close: function() {
   if (wb.isOpen) {
     o.beforeClose();
     m.unbindWindowResize();
-    wb.img.fadeOut(500, function() {
-      $(this).remove();
+    if (wb.contentType === wb.IMAGE) {
+      wb.img.fadeOut(500, function() {
+        $(this).remove();
+      });
+    }
+    wb.box.add(wb.overlay).fadeOut(500, function() {
       o.close();
     });
-    wb.box.add(wb.overlay).fadeOut(500);
     m.disable(wb.prev);
     m.disable(wb.next);
     m.hideTitle();
@@ -141,6 +106,85 @@ prev: function() {
     o = storeOptions;
     m.show(group.index - 1);
   }
+},
+openImage: function(url) {
+  var dimensions,
+      center;
+  $.when(m.loadImage(url))
+    .done(function() {
+      m.hideLoader();
+      if (wb.box.is(':visible')) { //listing
+        wb.img.appendTo(wb.content).hide();
+        dimensions = m.loadImageDimensions();
+        dimensions = m.getMaxDimensions(dimensions);
+        center = m.getCenter(dimensions);
+        $.when(m.resizeBox(dimensions, center)).then(function() {
+          m.setFixedPosition(dimensions);
+          m.setDimensions(wb.img, dimensions);
+          wb.img.fadeIn(500, function() {
+            m.setListing();
+            wb.close.show();
+            m.showTitle();
+            o.open();
+          });
+        });
+      } else { //opening
+        wb.img.appendTo(wb.content);
+        wb.box.fadeIn(500, function() {
+          m.setListing();
+          m.bindShortcuts();
+          m.bindWindowResize();
+          m.showTitle();
+          o.open();
+        });
+        if (o.overlay) {
+          wb.overlay.fadeTo(500, o.overlayOpacity);
+        }
+        dimensions = m.loadImageDimensions();
+        dimensions = m.getMaxDimensions(dimensions);
+        m.setDimensions(wb.box, dimensions);
+        m.setDimensions(wb.img, dimensions);
+        center = m.getCenter(dimensions);
+        m.setCenter(wb.box, center);
+        m.setFixedPosition(dimensions);
+      }
+      wb.isOpen = true;
+    })
+    .fail(function() {
+      m.hideLoader();
+      $.error('Error loading image '+ url);
+    });
+},
+openAjax: function(url) {
+  var dimensions,
+      center,
+      contentDimensions;
+  $.when($.ajax({url: url, type: 'GET'}))
+    .done(function(data) {
+        m.hideLoader();
+        wb.content.addClass('wb-content').append(data);
+        wb.box.fadeIn(500, function() {
+          m.bindShortcuts();
+          m.bindWindowResize();
+          o.open();
+        });
+        if (o.overlay) {
+          wb.overlay.fadeTo(500, o.overlayOpacity);
+        }
+        dimensions = [300, 300]; // TODO
+        dimensions = m.getMaxDimensions(dimensions);
+        m.setDimensions(wb.box, dimensions);
+        contentDimensions = m.getContentDimensions(dimensions);
+        m.setDimensions(wb.content, contentDimensions);
+        center = m.getCenter(dimensions);
+        m.setCenter(wb.box, center);
+        m.setFixedPosition(dimensions);
+        wb.isOpen = true;
+    })
+    .fail(function(jqXHR, textStatus, errorThrown) {
+      m.hideLoader();
+      $.error('Error '+ jqXHR.status +' '+ errorThrown +' while loading '+ url);
+    });
 },
 setFixedPosition: function(dimensions) {
   if (o.position === 'fixed') {
@@ -185,6 +229,29 @@ getMaxDimensions: function(dimensions) {
     return [parseInt(dimensions[0] * minRatio, 10), parseInt(dimensions[1] * minRatio, 10)];
   }
   return dimensions;
+},
+getContentDimensions: function(dimensions) {
+  var margin = {
+        top: parseInt(wb.content.css('marginTop'), 10),
+        right: parseInt(wb.content.css('marginRight'), 10),
+        bottom: parseInt(wb.content.css('marginBottom'), 10),
+        left: parseInt(wb.content.css('marginLeft'), 10)
+      },
+      border = {
+        top: parseInt(wb.content.css('borderTopWidth'), 10),
+        right: parseInt(wb.content.css('borderRightWidth'), 10),
+        bottom: parseInt(wb.content.css('borderBottomWidth'), 10),
+        left: parseInt(wb.content.css('borderLeftWidth'), 10)
+      },
+      padding = {
+        top: parseInt(wb.content.css('paddingTop'), 10),
+        right: parseInt(wb.content.css('paddingRight'), 10),
+        bottom: parseInt(wb.content.css('paddingBottom'), 10),
+        left: parseInt(wb.content.css('paddingLeft'), 10)
+      },
+      vertical = dimensions[1] - margin.top - margin.bottom - border.top - border.bottom - padding.top - padding.bottom,
+      horizontal = dimensions[0] - margin.left - margin.right - border.left - border.right - padding.left - padding.right;
+   return [ horizontal, vertical ];
 },
 loadImageDimensions: function() {
   var dimensions,
@@ -322,6 +389,13 @@ getSingleDataOptions: function() {
   });
   return SDO;
 },
+getContentType: function(url) {
+  var type = wb.AJAX;
+  if (url.match(/\.(jpg|gif|png|bmp|jpeg)(.*)?$/i)) {
+    type = wb.IMAGE;
+  }
+  return type;
+},
 positionArrows: function() {
   var $prev = wb.prev.children('span'),
       $next = wb.next.children('span'),
@@ -376,18 +450,22 @@ bindWindowResize: function() {
   $window.bind('resize.wb', function() {
     wb.close.hide();
     m.hideTitle();
-    $.when(m.hideImage()).then(function() {
-      var dimensions = m.loadImageDimensions();
-      dimensions = m.getMaxDimensions(dimensions);
-      var center = m.getCenter(dimensions, o.position === 'fixed');
-      $.when(m.resizeBox(dimensions, center)).then(function() {
-        m.setDimensions(wb.img, dimensions);
-        wb.img.fadeIn(500);
-        wb.close.show();
-        m.showTitle();
-        m.positionArrows();
+    if (wb.contentType === wb.IMAGE) {
+      $.when(m.hideImage()).then(function() {
+        var dimensions = m.loadImageDimensions();
+        dimensions = m.getMaxDimensions(dimensions);
+        var center = m.getCenter(dimensions, o.position === 'fixed');
+        $.when(m.resizeBox(dimensions, center)).then(function() {
+          m.setDimensions(wb.img, dimensions);
+          wb.img.fadeIn(500);
+          wb.close.show();
+          m.showTitle();
+          m.positionArrows();
+        });
       });
-    });
+    } else {
+      
+    }
   });
 },
 unbindWindowResize: function() {

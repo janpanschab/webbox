@@ -30,6 +30,7 @@ z-indexes
 	border-radius: 7px 0 7px 7px; /* Opera 10.5, IE9, Saf5, Chrome, FF4, iOS 4, Android 2.1+ */
 }
 #wb-content { position: relative; z-index: 1002; }
+#wb-content.wb-content { margin: 10px; padding: 10px; overflow: auto; }
 #webbox img { display: block; }
 #wb-close,
 #wb-prev span,
