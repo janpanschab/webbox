@@ -365,7 +365,7 @@ loadIframe: function(url) {
     .attr('src', url);
   // TODO - iframe never trigger error handler
   setTimeout(function() {
-    dfd.resolve(); // reject
+    dfd.resolve(); // or reject?
   }, 10000);
   return dfd.promise();
 },
