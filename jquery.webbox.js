@@ -16,7 +16,6 @@ window.log = function(){
         position: 'absolute', // fixed, absolute
         margin: 50,
         loaderDelay: 250,
-        contentClass: 'wb-content',
         width: 600,
         height: 600,
         beforeOpen: function() {},
@@ -24,13 +23,14 @@ window.log = function(){
         beforeClose: function() {},
         close: function() {}
       },
-      singleOptions = ['wb-position','wb-overlay'],
+      singleOptions = ['wb-position','wb-overlay', 'wb-iframe', 'wb-width', 'wb-height'],
       storeOptions,
       cache = [],
       $body = $('body'),
       wb = {
         IMAGE: 'image',
-        AJAX: 'ajax'
+        AJAX: 'ajax',
+        IFRAME: 'iframe'
       },
       group = {},
       m = {
@@ -74,6 +74,7 @@ open: function(trigger) {
     wb.contentType = m.getContentType(url);
     switch (wb.contentType) {
       case wb.AJAX: m.openAjax(url); break;
+      case wb.IFRAME: m.openIframe(url); break;
       default: m.openImage(url);
     }
   }
@@ -87,7 +88,7 @@ close: function() {
         $(this).remove();
       });
     } else {
-      wb.content.removeClass(o.contentClass).empty();
+      wb.content.removeClass('wb-content').empty();
     }
     wb.box.add(wb.overlay).fadeOut(500, function() {
       o.close();
@@ -169,7 +170,7 @@ openAjax: function(url) {
   $.when($.ajax({url: url, type: 'GET'}))
     .done(function(data) {
         m.hideLoader();
-        wb.content.addClass(o.contentClass).append(data);
+        wb.content.addClass('wb-content').append(data);
         wb.box.fadeIn(500, function() {
           m.bindShortcuts();
           m.bindWindowResize();
@@ -191,6 +192,37 @@ openAjax: function(url) {
     .fail(function(jqXHR, textStatus, errorThrown) {
       m.hideLoader();
       $.error('Error '+ jqXHR.status +' '+ errorThrown +' while loading '+ url);
+    });
+},
+openIframe: function(url) {
+  var dimensions,
+      center,
+      contentDimensions;
+  $.when(m.loadIframe(url))
+    .done(function() {
+      m.hideLoader();
+      wb.content.addClass('wb-iframe');
+      wb.box.fadeIn(500, function() {
+        m.bindShortcuts();
+        m.bindWindowResize();
+        o.open();
+      });
+      if (o.overlay) {
+        wb.overlay.fadeTo(500, o.overlayOpacity);
+      }
+      dimensions = [o.width, o.height];
+      dimensions = m.getMaxDimensions(dimensions);
+      m.setDimensions(wb.box, dimensions);
+      contentDimensions = m.getContentDimensions(dimensions);
+      m.setDimensions(wb.content, contentDimensions);
+      center = m.getCenter(dimensions);
+      m.setCenter(wb.box, center);
+      m.setFixedPosition(dimensions);
+      wb.isOpen = true;
+    })
+    .fail(function() {
+      m.hideLoader();
+      $.error('Error while loading '+ url);
     });
 },
 setFixedPosition: function(dimensions) {
@@ -323,6 +355,20 @@ loadImage: function(url) {
     .attr('src', url);
   return dfd.promise();
 },
+loadIframe: function(url) {
+  var dfd = $.Deferred();
+  wb.iframe = $('<iframe />');
+  wb.iframe
+    .appendTo(wb.content)
+    .load(dfd.resolve)
+    //.error(dfd.reject)
+    .attr('src', url);
+  // TODO - iframe never trigger error handler
+  setTimeout(function() {
+    dfd.resolve(); // reject
+  }, 10000);
+  return dfd.promise();
+},
 hideContent: function() {
   var dfd = $.Deferred();
   wb.content.fadeOut(500, dfd.resolve);
@@ -400,6 +446,8 @@ getContentType: function(url) {
   var type = wb.AJAX;
   if (url.match(/\.(jpg|gif|png|bmp|jpeg)(.*)?$/i)) {
     type = wb.IMAGE;
+  } else if (o.iframe) {
+    type = wb.IFRAME
   }
   return type;
 },
