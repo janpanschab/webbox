@@ -88,7 +88,7 @@ close: function() {
         $(this).remove();
       });
     } else {
-      wb.content.removeClass('wb-content').empty();
+      wb.content.removeClass('wb-content').removeClass('wb-iframe').empty();
     }
     wb.box.add(wb.overlay).fadeOut(500, function() {
       o.close();
@@ -357,7 +357,7 @@ loadImage: function(url) {
 },
 loadIframe: function(url) {
   var dfd = $.Deferred();
-  wb.iframe = $('<iframe />');
+  wb.iframe = $('<iframe frameborder="0" />');
   wb.iframe
     .appendTo(wb.content)
     .load(dfd.resolve)

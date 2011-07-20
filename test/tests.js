@@ -422,3 +422,40 @@ test('close', function() {
     }, timeout);
   }, timeout);
 });
+
+
+module('iframe');
+
+test('open', function() {
+  stop();
+  expect(3);
+  $('a.webbox').webbox();
+  var $webbox = $('#webbox');
+  $('a.webbox').webbox('open', $('a.webbox:eq(6)'));
+  
+  setTimeout(function() {
+    ok($webbox.is(':visible'), '#webbox is visible');
+    ok($webbox.find('#wb-content').hasClass('wb-iframe'), '#wb-content has class wb-iframe');
+    ok($webbox.find('#wb-content').children('iframe').length, 'iframe is chidlren of #wb-content');
+    
+    start();
+  }, timeout);
+});
+
+test('close', function() {
+  stop();
+  expect(2);
+  $('a.webbox').webbox();
+  var $webbox = $('#webbox');
+  $('a.webbox').webbox('open', $('a.webbox:eq(6)'));
+  
+  setTimeout(function() {
+    $('a.webbox').webbox('close');
+    setTimeout(function() {
+      ok($webbox.is(':hidden'), '#webbox is hidden');
+      equals($webbox.find('#wb-content').hasClass('wb-iframe'), false, '#wb-content has not class wb-iframe');
+
+      start();
+    }, timeout);
+  }, timeout);
+});
