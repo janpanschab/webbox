@@ -313,7 +313,7 @@ test('is next disabled when open last image', function() {
   stop();
   expect(1);
   $('a.webbox').webbox();
-  $('a.webbox').webbox('open', $('a.webbox:last'));
+  $('a.webbox').webbox('open', $('a.webbox:eq(4)'));
   
   setTimeout(function() {
     ok($('#wb-next').is(':hidden'), '#wb-next is hidden');
@@ -455,6 +455,48 @@ test('close', function() {
       ok($webbox.is(':hidden'), '#webbox is hidden');
       equals($webbox.find('#wb-content').hasClass('wb-iframe'), false, '#wb-content has not class wb-iframe');
 
+      start();
+    }, timeout);
+  }, timeout);
+});
+
+
+module('anchor');
+
+test('open', function() {
+  stop();
+  expect(4);
+  $('a.webbox').webbox();
+  var $webbox = $('#webbox');
+  $('a.webbox').webbox('open', $('a.webbox:eq(7)'));
+  
+  setTimeout(function() {
+    ok($webbox.is(':visible'), '#webbox is visible');
+    ok($webbox.find('#wb-content').hasClass('wb-content'), '#wb-content has class wb-content');
+    ok($webbox.find('#wb-content').children('h3').length, 'h3 is chidlren of #wb-content');
+    equals($('#content').children().length, 0, '#content is empty');
+    
+    $('a.webbox').webbox('close');
+    setTimeout(function() {
+      start();
+    }, timeout);
+  }, timeout);
+});
+
+test('close', function() {
+  stop();
+  expect(3);
+  $('a.webbox').webbox();
+  var $webbox = $('#webbox');
+  $('a.webbox').webbox('open', $('a.webbox:eq(7)'));
+  
+  setTimeout(function() {
+    $('a.webbox').webbox('close');
+    setTimeout(function() {
+      ok($webbox.is(':hidden'), '#webbox is hidden');
+      equals($webbox.find('#wb-content').hasClass('wb-content'), false, '#wb-content has not class wb-content');
+      ok($('#content').children('h3').length, 'h3 is children of #content');
+      
       start();
     }, timeout);
   }, timeout);

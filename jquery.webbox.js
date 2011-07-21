@@ -30,7 +30,8 @@ window.log = function(){
       wb = {
         IMAGE: 'image',
         AJAX: 'ajax',
-        IFRAME: 'iframe'
+        IFRAME: 'iframe',
+        ANCHOR: 'anchor'
       },
       group = {},
       m = {
@@ -50,6 +51,7 @@ init: function(options) {
   m.bindOpen();
   m.bindClose();
   m.bindListing();
+  m.hideAnchors();
   return this;
 },
 open: function(trigger) {
@@ -75,6 +77,7 @@ open: function(trigger) {
     switch (wb.contentType) {
       case wb.AJAX: m.openAjax(url); break;
       case wb.IFRAME: m.openIframe(url); break;
+      case wb.ANCHOR: m.openAnchor(url); break;
       default: m.openImage(url);
     }
   }
@@ -83,6 +86,9 @@ close: function() {
   if (wb.isOpen) {
     o.beforeClose();
     m.unbindWindowResize();
+    if (wb.contentType === wb.ANCHOR) {
+      wb.content.children().appendTo(wb.trigger.attr('href'));
+    }
     if (wb.contentType === wb.IMAGE) {
       wb.img.fadeOut(500, function() {
         $(this).remove();
@@ -224,6 +230,33 @@ openIframe: function(url) {
       m.hideLoader();
       $.error('Error while loading '+ url);
     });
+},
+openAnchor: function(url) {
+  var dimensions,
+      center,
+      contentDimensions,
+      $content = $(url);
+  if ($content.length) {
+    m.hideLoader();
+    wb.content.addClass('wb-content').append($content.children());
+    wb.box.fadeIn(500, function() {
+      m.bindShortcuts();
+      m.bindWindowResize();
+      o.open();
+    });
+    if (o.overlay) {
+      wb.overlay.fadeTo(500, o.overlayOpacity);
+    }
+    dimensions = [o.width, o.height];
+    dimensions = m.getMaxDimensions(dimensions);
+    m.setDimensions(wb.box, dimensions);
+    contentDimensions = m.getContentDimensions(dimensions);
+    m.setDimensions(wb.content, contentDimensions);
+    center = m.getCenter(dimensions);
+    m.setCenter(wb.box, center);
+    m.setFixedPosition(dimensions);
+    wb.isOpen = true;
+  }
 },
 setFixedPosition: function(dimensions) {
   if (o.position === 'fixed') {
@@ -448,8 +481,19 @@ getContentType: function(url) {
     type = wb.IMAGE;
   } else if (o.iframe) {
     type = wb.IFRAME
+  } else if (/^#/.test(url)) {
+    type = wb.ANCHOR;
   }
   return type;
+},
+hideAnchors: function() {
+  wb.self.each(function() {
+    var $trigger = $(this),
+        url = $trigger.attr('href');
+    if (/^#/.test(url)) {
+      $(url).hide();
+    }
+  });
 },
 positionArrows: function() {
   var $prev = wb.prev.children('span'),
