@@ -23,18 +23,20 @@ window.log = function(){
         beforeClose: function() {},
         close: function() {}
       },
-      singleOptions = ['wb-position','wb-overlay', 'wb-iframe', 'wb-width', 'wb-height'],
-      storeOptions,
-      loaderTimeout, // for loader setTimeout
-      cache = [],
-      $body = $('body'),
       wb = {
         IMAGE: 'image',
         AJAX: 'ajax',
         IFRAME: 'iframe',
-        ANCHOR: 'anchor'
+        ANCHOR: 'anchor',
+        singleOptions: ['wb-position','wb-overlay', 'wb-iframe', 'wb-width', 'wb-height'],
+        storeOptions: {},
+        loaderTimeout: {}, // for loader setTimeout
+        cache: [],
+        group: {},
+        $body: $('body'),
+        $window: $(window),
+        $document: $(document)
       },
-      group = {},
       m = {
         
 init: function(options) {
@@ -42,7 +44,7 @@ init: function(options) {
     m.destroy();
   }
   o = $.extend({}, settings, options);
-  storeOptions = o;
+  wb.storeOptions = o;
   wb.self = this;
   wb.isCreated = false;
   wb.isOpen = false;
@@ -104,20 +106,20 @@ close: function() {
     m.disable(wb.next);
     m.hideTitle();
     m.unbindShortcuts();
-    o = storeOptions;
+    o = wb.storeOptions;
     wb.isOpen = false;
   }
 },
 next: function() {
-  if (group.name !== undefined && group.name !== false && group.index !== group.size - 1 && wb.isOpen) {
-    o = storeOptions;
-    m.show(group.index + 1);
+  if (wb.group.name !== undefined && wb.group.name !== false && wb.group.index !== wb.group.size - 1 && wb.isOpen) {
+    o = wb.storeOptions;
+    m.show(wb.group.index + 1);
   }
 },
 prev: function() {
-  if (group.name !== undefined && group.name !== false && group.index !== 0 && wb.isOpen) {
-    o = storeOptions;
-    m.show(group.index - 1);
+  if (wb.group.name !== undefined && wb.group.name !== false && wb.group.index !== 0 && wb.isOpen) {
+    o = wb.storeOptions;
+    m.show(wb.group.index - 1);
   }
 },
 openImage: function(url) {
@@ -353,9 +355,8 @@ setDimensions: function($el, dimensions) {
   $el.width(dimensions[0]).height(dimensions[1]);
 },
 getViewport: function(margin) {
-  var $window = $(window),
-      width = $window.width(),
-      height = $window.height(),
+  var width = wb.$window.width(),
+      height = wb.$window.height(),
       doubleMargin = (2 * margin);
   if (margin) {
     return [ width - doubleMargin, height - doubleMargin ];
@@ -363,7 +364,7 @@ getViewport: function(margin) {
   return [width, height];
 },
 getScroll: function() {
-  return [ $(document).scrollTop(), $(document).scrollLeft() ];
+  return [ wb.$document.scrollTop(), wb.$document.scrollLeft() ];
 },
 getCenter: function(dimensions, fixed) {
   var viewport = m.getViewport(),
@@ -410,7 +411,7 @@ hideContent: function() {
   return dfd.promise();
 },
 showLoader: function() {
-  loaderTimeout = setTimeout(function() {
+  wb.loaderTimeout = setTimeout(function() {
     wb.loader.show();
     var dimensions = m.getDimensions(wb.loader),
         center = m.getCenter(dimensions, true);
@@ -418,7 +419,7 @@ showLoader: function() {
   }, o.loaderDelay);
 },
 hideLoader: function() {
-  clearTimeout(loaderTimeout);
+  clearTimeout(wb.loaderTimeout);
   wb.loader.hide();
 },
 tabNavigation: function(e) {
@@ -459,7 +460,7 @@ enter: function(e) {
   }
 },
 bindShortcuts: function() {
-  $(document).bind('keydown.wb', function(e) {
+  wb.$document.bind('keydown.wb', function(e) {
     switch (e.which) {
       case 27:m.close();break;
       case 37:m.prev();break;
@@ -470,22 +471,22 @@ bindShortcuts: function() {
   });
 },
 unbindShortcuts: function() {
-  $(document).unbind('keydown.wb');
+  wb.$document.unbind('keydown.wb');
 },
 setListing: function() {
-  group.name = wb.trigger.data('wbGroup') || false;
-  if (group.name) {
-    group.triggers = $(wb.self.selector +'[data-wb-group='+ group.name +']');
-    group.index = group.triggers.index(wb.trigger);
-    group.size = group.triggers.size();
-    if (group.size > 1) {
-      if (group.index !== 0) {
+  wb.group.name = wb.trigger.data('wbGroup') || false;
+  if (wb.group.name) {
+    wb.group.triggers = $(wb.self.selector +'[data-wb-group='+ wb.group.name +']');
+    wb.group.index = wb.group.triggers.index(wb.trigger);
+    wb.group.size = wb.group.triggers.size();
+    if (wb.group.size > 1) {
+      if (wb.group.index !== 0) {
         m.enable(wb.prev);
-        m.preload(group.triggers.eq(group.index - 1));
+        m.preload(wb.group.triggers.eq(wb.group.index - 1));
       }
-      if (group.index !== group.size - 1) {
+      if (wb.group.index !== wb.group.size - 1) {
         m.enable(wb.next);
-        m.preload(group.triggers.eq(group.index + 1));
+        m.preload(wb.group.triggers.eq(wb.group.index + 1));
       }
     }
     m.positionArrows();
@@ -493,10 +494,10 @@ setListing: function() {
 },
 preload: function($trigger) {
   var src = $trigger.attr('href');
-  if ($.inArray(src, cache) === -1) {
+  if ($.inArray(src, wb.cache) === -1) {
     var img = document.createElement('img');
     img.src = src;
-    cache.push(src);
+    wb.cache.push(src);
   };
 },
 enable: function($el) {
@@ -507,7 +508,7 @@ disable: function($el) {
 },
 getSingleDataOptions: function() {
   var SDO = [];
-  $.each(singleOptions, function(i, val) {
+  $.each(wb.singleOptions, function(i, val) {
     var dataO = wb.trigger.data(val),
         key = val.replace('wb-', '');
     if (dataO !== undefined) {
@@ -556,18 +557,18 @@ show: function(index) {
       var dimensions = m.getDimensions(wb.box);
       m.setAbsolutePosition(dimensions);
       wb.img.remove();
-      m.open(group.triggers.eq(index));
+      m.open(wb.group.triggers.eq(index));
     });
 },
 bindListing: function() {
   wb.prev.add(wb.next).bind('click.wb', function(e) {
-    var showIndex = this === wb.prev.get(0) ? group.index - 1 : group.index + 1;
-    o = storeOptions;
+    var showIndex = this === wb.prev.get(0) ? wb.group.index - 1 : wb.group.index + 1;
+    o = wb.storeOptions;
     m.show(showIndex);
   });
 },
 bindOpen: function() {
-  $body.delegate(wb.self.selector +':not(#wb-close, #wb-prev, #wb-next)', 'click.wb', function(e) {
+  wb.$body.delegate(wb.self.selector +':not(#wb-close, #wb-prev, #wb-next)', 'click.wb', function(e) {
     e.preventDefault();
     m.open(this);
   });
@@ -586,11 +587,10 @@ bindCloseOnOverlayClick: function() {
   });
 },
 bindWindowResize: function() {
-  var $window = $(window),
-      dimensions,
+  var dimensions,
       center,
       contentDimensions;
-  $window.bind('resize.wb', function() {
+  wb.$window.bind('resize.wb', function() {
     wb.close.hide();
     m.hideTitle();
     $.when(m.hideContent()).then(function() {
@@ -617,7 +617,7 @@ bindWindowResize: function() {
   });
 },
 unbindWindowResize: function() {
-  $(window).unbind('resize.wb');
+  wb.$window.unbind('resize.wb');
 },
 create: function() {
   $('<div id="webbox" role="dialog" tabindex="-1"><div id="wb-content"></div><div id="wb-close" role="button" tabindex="0">×</div><div id="wb-prev" class="disabled" role="button" aria-disabled="true" tabindex="0"><span>«</span></div><div id="wb-next" class="disabled" role="button" aria-disabled="true" tabindex="0"><span>»</span></div><div id="wb-title"><div id="wb-title-aria" /></div></div><div id="wb-loader"><span>\u2605</span></div>').appendTo('body');
@@ -636,8 +636,8 @@ create: function() {
 },
 destroy: function() {
   wb.box.add(wb.overlay).add(wb.loader).remove();
-  $body.undelegate('.wb');
-  $(window).unbind('.wb');
+  wb.$body.undelegate('.wb');
+  wb.$window.unbind('.wb');
   m.unbindWindowResize();
   wb.isCreated = false;
   wb.isOpen = false;
