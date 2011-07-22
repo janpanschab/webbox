@@ -25,6 +25,7 @@ window.log = function(){
       },
       singleOptions = ['wb-position','wb-overlay', 'wb-iframe', 'wb-width', 'wb-height'],
       storeOptions,
+      loaderTimeout, // for loader setTimeout
       cache = [],
       $body = $('body'),
       wb = {
@@ -75,10 +76,10 @@ open: function(trigger) {
     // switch open by content type
     wb.contentType = m.getContentType(url);
     switch (wb.contentType) {
-      case wb.AJAX: m.openAjax(url); break;
-      case wb.IFRAME: m.openIframe(url); break;
-      case wb.ANCHOR: m.openAnchor(url); break;
-      default: m.openImage(url);
+      case wb.AJAX:m.openAjax(url);break;
+      case wb.IFRAME:m.openIframe(url);break;
+      case wb.ANCHOR:m.openAnchor(url);break;
+      default:m.openImage(url);
     }
   }
 },
@@ -145,6 +146,7 @@ openImage: function(url) {
         wb.img.appendTo(wb.content);
         wb.content.show();
         wb.box.fadeIn(500, function() {
+          wb.box.focus();
           m.setListing();
           m.bindShortcuts();
           m.bindWindowResize();
@@ -408,7 +410,7 @@ hideContent: function() {
   return dfd.promise();
 },
 showLoader: function() {
-  loaderDelay = setTimeout(function() {
+  loaderTimeout = setTimeout(function() {
     wb.loader.show();
     var dimensions = m.getDimensions(wb.loader),
         center = m.getCenter(dimensions, true);
@@ -416,8 +418,45 @@ showLoader: function() {
   }, o.loaderDelay);
 },
 hideLoader: function() {
-  clearTimeout(loaderDelay);
+  clearTimeout(loaderTimeout);
   wb.loader.hide();
+},
+tabNavigation: function(e) {
+  e.preventDefault();
+  if (wb.isOpen) {
+    var $focusedElement = wb.box.find(':focus'),
+        focusedElement = $focusedElement.get(0);
+    if ($focusedElement.length) {
+      if (focusedElement === wb.next.get(0)) {
+        if (wb.prev.is(':visible')) {
+          wb.prev.focus();
+        } else {
+          wb.close.focus();
+        }
+      } else if (focusedElement === wb.prev.get(0)) {
+        wb.close.focus();
+      } else if (focusedElement === wb.close.get(0)) {
+        if (wb.next.is(':visible')) {
+          wb.next.focus();
+        } else if (wb.prev.is(':visible')) {
+          wb.prev.focus();
+        }
+      }
+    } else {
+      if (wb.next.is(':visible')) {
+        wb.next.focus();
+      } else if (wb.prev.is(':visible')) {
+        wb.prev.focus();
+      } else {
+        wb.close.focus();
+      }
+    }
+  }
+},
+enter: function(e) {
+  if (wb.isOpen) {
+    wb.box.find(':focus').click();
+  }
 },
 bindShortcuts: function() {
   $(document).bind('keydown.wb', function(e) {
@@ -425,6 +464,8 @@ bindShortcuts: function() {
       case 27:m.close();break;
       case 37:m.prev();break;
       case 39:m.next();break;
+      case 9:m.tabNavigation(e);break;
+      case 13:m.enter(e);break;
     }
   });
 },
@@ -579,7 +620,7 @@ unbindWindowResize: function() {
   $(window).unbind('resize.wb');
 },
 create: function() {
-  $('<div id="webbox" role="dialog"><div id="wb-content"></div><div id="wb-close" role="button">×</div><div id="wb-prev" class="disabled" role="button" aria-disabled="true"><span>«</span></div><div id="wb-next" class="disabled" role="button" aria-disabled="true"><span>»</span></div><div id="wb-title"><div id="wb-title-aria" /></div></div><div id="wb-loader"><span>\u2605</span></div>').appendTo('body');
+  $('<div id="webbox" role="dialog" tabindex="-1"><div id="wb-content"></div><div id="wb-close" role="button" tabindex="0">×</div><div id="wb-prev" class="disabled" role="button" aria-disabled="true" tabindex="0"><span>«</span></div><div id="wb-next" class="disabled" role="button" aria-disabled="true" tabindex="0"><span>»</span></div><div id="wb-title"><div id="wb-title-aria" /></div></div><div id="wb-loader"><span>\u2605</span></div>').appendTo('body');
   wb.box = $('#webbox');
   wb.close = $('#wb-close');
   wb.prev = $('#wb-prev');

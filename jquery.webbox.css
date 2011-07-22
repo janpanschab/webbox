@@ -36,6 +36,8 @@ z-indexes
 #wb-prev span,
 #wb-next span { font-size: 36px; line-height: 1; background-color: #fff; color: #333; }
 #wb-close:hover,
+#wb-close:focus,
+#wb-close:active,
 #wb-prev span:hover,
 #wb-next span:hover { color: #9af; }
 #wb-close {
@@ -54,7 +56,11 @@ z-indexes
 #wb-prev { left: 0; }
 #wb-next { right: 0; }
 #wb-prev.enabled:hover span,
-#wb-next.enabled:hover span { display: block; }
+#wb-next.enabled:hover span,
+#wb-prev.enabled:focus span,
+#wb-next.enabled:focus span,
+#wb-prev.enabled:active span,
+#wb-next.enabled:active span { display: block; }
 #wb-prev span,
 #wb-next span { position: absolute; padding: 0px 12px 5px; line-height: 1; }
 #wb-prev span {
