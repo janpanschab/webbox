@@ -44,7 +44,7 @@ init: function(options) {
     m.destroy();
   }
   o = $.extend({}, settings, options);
-  wb.storeOptions = o;
+  wb.storeOptions = o; // store default options when some specific (single) options are used on each trigger
   wb.self = this;
   wb.isCreated = false;
   wb.isOpen = false;
@@ -54,7 +54,7 @@ init: function(options) {
   m.bindOpen();
   m.bindClose();
   m.bindListing();
-  m.hideAnchors();
+  m.hideAnchors(); // hide content in anchors (is better to hide them in css because of flashing)
   return this;
 },
 open: function(trigger) {
@@ -72,16 +72,17 @@ open: function(trigger) {
     }
     singleDataOptions = m.getSingleDataOptions();
     o = $.extend({}, o, singleDataOptions) // extend options with data from single data options
-    wb.box.css('position', 'absolute');
-    o.beforeOpen();
+    wb.box.css('position', 'absolute'); // box must have absolute position when is animated - fixed position (if option position fixed is set) is set after animation is finished
+    o.beforeOpen(); // call custom function before webbox is opened
     m.showLoader();
     // switch open by content type
     wb.contentType = m.getContentType(url);
     switch (wb.contentType) {
-      case wb.AJAX:m.openAjax(url);break;
-      case wb.IFRAME:m.openIframe(url);break;
-      case wb.ANCHOR:m.openAnchor(url);break;
-      default:m.openImage(url);
+      case wb.AJAX:
+      case wb.IFRAME:
+      case wb.ANCHOR: m.openContent(url); break;
+      case wb.IMAGE:
+      default: m.openImage(url);
     }
   }
 },
@@ -173,94 +174,63 @@ openImage: function(url) {
       $.error('Error loading image '+ url);
     });
 },
-openAjax: function(url) {
-  var dimensions,
-      center,
-      contentDimensions;
-  $.when($.ajax({url: url, type: 'GET'}))
-    .done(function(data) {
+openContent: function(url) {
+  if (wb.contentType === wb.AJAX) {
+    $.when($.ajax({url: url, type: 'GET'}))
+      .done(function(data) {
+        m.contentDone(data);
+      })
+      .fail(function(jqXHR, textStatus, errorThrown) {
         m.hideLoader();
-        wb.content.addClass('wb-content').append(data);
-        wb.box.fadeIn(500, function() {
-          m.bindShortcuts();
-          m.bindWindowResize();
-          o.open();
-        });
-        if (o.overlay) {
-          wb.overlay.fadeTo(500, o.overlayOpacity);
-        }
-        dimensions = [o.width, o.height];
-        dimensions = m.getMaxDimensions(dimensions);
-        m.setDimensions(wb.box, dimensions);
-        contentDimensions = m.getContentDimensions(dimensions);
-        m.setDimensions(wb.content, contentDimensions);
-        center = m.getCenter(dimensions);
-        m.setCenter(wb.box, center);
-        m.setFixedPosition(dimensions);
-        wb.isOpen = true;
-    })
-    .fail(function(jqXHR, textStatus, errorThrown) {
-      m.hideLoader();
-      $.error('Error '+ jqXHR.status +' '+ errorThrown +' while loading '+ url);
-    });
+        $.error('Error '+ jqXHR.status +' '+ errorThrown +' while loading '+ url);
+      });
+  } else if (wb.contentType === wb.IFRAME) {
+    $.when(m.loadIframe(url))
+      .done(function() {
+        m.contentDone();
+      })
+      .fail(function() {
+        m.hideLoader();
+        $.error('Error while loading '+ url);
+      });
+  } else if (wb.contentType === wb.ANCHOR) {
+    // if element with id url exist (id="[url]")
+    if ($(url).length) {
+      m.contentDone($(url).children());
+    } else {
+      $.error('Can\'t find anchor '+ url);
+    }
+  }
 },
-openIframe: function(url) {
+contentDone: function(data) {
   var dimensions,
       center,
       contentDimensions;
-  $.when(m.loadIframe(url))
-    .done(function() {
-      m.hideLoader();
-      wb.content.addClass('wb-iframe');
-      wb.box.fadeIn(500, function() {
-        m.bindShortcuts();
-        m.bindWindowResize();
-        o.open();
-      });
-      if (o.overlay) {
-        wb.overlay.fadeTo(500, o.overlayOpacity);
-      }
-      dimensions = [o.width, o.height];
-      dimensions = m.getMaxDimensions(dimensions);
-      m.setDimensions(wb.box, dimensions);
-      contentDimensions = m.getContentDimensions(dimensions);
-      m.setDimensions(wb.content, contentDimensions);
-      center = m.getCenter(dimensions);
-      m.setCenter(wb.box, center);
-      m.setFixedPosition(dimensions);
-      wb.isOpen = true;
-    })
-    .fail(function() {
-      m.hideLoader();
-      $.error('Error while loading '+ url);
-    });
-},
-openAnchor: function(url) {
-  var dimensions,
-      center,
-      contentDimensions,
-      $content = $(url);
-  if ($content.length) {
-    m.hideLoader();
-    wb.content.addClass('wb-content').append($content.children());
-    wb.box.fadeIn(500, function() {
-      m.bindShortcuts();
-      m.bindWindowResize();
-      o.open();
-    });
-    if (o.overlay) {
-      wb.overlay.fadeTo(500, o.overlayOpacity);
-    }
-    dimensions = [o.width, o.height];
-    dimensions = m.getMaxDimensions(dimensions);
-    m.setDimensions(wb.box, dimensions);
-    contentDimensions = m.getContentDimensions(dimensions);
-    m.setDimensions(wb.content, contentDimensions);
-    center = m.getCenter(dimensions);
-    m.setCenter(wb.box, center);
-    m.setFixedPosition(dimensions);
-    wb.isOpen = true;
+  m.hideLoader();
+  if (wb.contentType === wb.AJAX) {
+    wb.content.addClass('wb-content').append(data);
+  } else if (wb.contentType === wb.IFRAME) {
+    wb.content.addClass('wb-iframe');
+  } else if (wb.contentType === wb.ANCHOR) {
+    wb.content.addClass('wb-content').append(data);
   }
+  wb.box.fadeIn(500, function() {
+    m.bindShortcuts();
+    m.bindWindowResize();
+    o.open();
+  });
+  if (o.overlay) {
+    wb.overlay.fadeTo(500, o.overlayOpacity);
+  }
+  dimensions = [o.width, o.height];
+  dimensions = m.getMaxDimensions(dimensions);
+  m.setDimensions(wb.box, dimensions);
+  contentDimensions = m.getContentDimensions(dimensions);
+  m.setDimensions(wb.content, contentDimensions);
+  center = m.getCenter(dimensions);
+  m.setCenter(wb.box, center);
+  m.setFixedPosition(dimensions);
+  wb.isOpen = true;
 },
 setFixedPosition: function(dimensions) {
   if (o.position === 'fixed') {
