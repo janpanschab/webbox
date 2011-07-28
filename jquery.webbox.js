@@ -207,12 +207,10 @@ contentDone: function(data) {
       center,
       contentDimensions;
   m.hideLoader();
-  if (wb.contentType === wb.AJAX) {
+  if (wb.contentType === wb.AJAX || wb.contentType === wb.ANCHOR) {
     wb.content.addClass('wb-content').append(data);
   } else if (wb.contentType === wb.IFRAME) {
     wb.content.addClass('wb-iframe');
-  } else if (wb.contentType === wb.ANCHOR) {
-    wb.content.addClass('wb-content').append(data);
   }
   wb.box.fadeIn(500, function() {
     m.bindShortcuts();
