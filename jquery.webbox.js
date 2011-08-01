@@ -28,7 +28,7 @@ window.log = function(){
         AJAX: 'ajax',
         IFRAME: 'iframe',
         ANCHOR: 'anchor',
-        singleOptions: ['wb-position','wb-overlay', 'wb-iframe', 'wb-width', 'wb-height'],
+        singleOptions: ['wb-position','wb-overlay', 'wb-iframe', 'wb-width', 'wb-height'], // possible single options
         storeOptions: {},
         loaderTimeout: {}, // for loader setTimeout
         cache: [],
