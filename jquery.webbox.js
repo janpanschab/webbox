@@ -1,3 +1,13 @@
+/*
+ * jQuery Webbox Plugin - 1.0, 2011/8/1
+ * Copyright (c) 2011, Jan Panschab
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ *  - http://www.opensource.org/licenses/mit-license.php
+ *  - http://www.gnu.org/copyleft/gpl.html
+ * 
+ * https://github.com/janpanschab/webbox
+*/
+
 window.log = function(){
   log.history = log.history || [];
   log.history.push(arguments);
@@ -71,7 +81,7 @@ open: function(trigger) {
       o = $.extend({}, o, dataOptions);
     }
     singleDataOptions = m.getSingleDataOptions();
-    o = $.extend({}, o, singleDataOptions) // extend options with data from single data options
+    o = $.extend({}, o, singleDataOptions); // extend options with data from single data options
     wb.box.css('position', 'absolute'); // box must have absolute position when is animated - fixed position (if option position fixed is set) is set after animation is finished
     o.beforeOpen(); // call custom function before webbox is opened
     m.showLoader();
@@ -81,7 +91,7 @@ open: function(trigger) {
       case wb.AJAX:
       case wb.IFRAME:
       case wb.ANCHOR: m.openContent(url); break;
-      case wb.IMAGE:
+      case wb.IMAGE: m.openImage(url); break;
       default: m.openImage(url);
     }
   }
@@ -466,7 +476,7 @@ preload: function($trigger) {
     var img = document.createElement('img');
     img.src = src;
     wb.cache.push(src);
-  };
+  }
 },
 enable: function($el) {
   $el.removeClass('disabled').addClass('enabled').attr('aria-disabled', false).show();
@@ -490,7 +500,7 @@ getContentType: function(url) {
   if (url.match(/\.(jpg|gif|png|bmp|jpeg)(.*)?$/i)) {
     type = wb.IMAGE;
   } else if (o.iframe) {
-    type = wb.IFRAME
+    type = wb.IFRAME;
   } else if (/^#/.test(url)) {
     type = wb.ANCHOR;
   }

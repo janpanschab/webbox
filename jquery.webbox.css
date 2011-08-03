@@ -1,4 +1,14 @@
 /*
+ * jQuery Webbox Plugin - 1.0, 2011/8/1
+ * Copyright (c) 2011, Jan Panschab
+ * Dual licensed under the MIT or GPL Version 2 licenses.
+ *  - http://www.opensource.org/licenses/mit-license.php
+ *  - http://www.gnu.org/copyleft/gpl.html
+ * 
+ * https://github.com/janpanschab/webbox
+*/
+
+/*
 z-indexes
 ---------
 1000 - #wb-overlay
