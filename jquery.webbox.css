@@ -55,8 +55,13 @@ z-indexes
 #wb-next { position: absolute; z-index: 1003; top: 0; width: 25%; height: 100%; cursor: pointer; }
 #wb-prev { left: 0; }
 #wb-next { right: 0; }
-#wb-prev.enabled, /* fixed IE bug on hover transparent element (must have background color) */
-#wb-next.enabled { background-color: #fff; -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)"; filter: alpha(opacity=0); }
+#wb-prev.enabled,
+#wb-next.enabled { /* fixed IE bug on hover transparent element (must have background color) */
+	background-color: #000;
+	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+	filter: alpha(opacity=0);
+	background-color: rgba(0,0,0,0); /* reset for non IE browsers */
+}
 #wb-prev.enabled:hover span,
 #wb-next.enabled:hover span,
 #wb-prev.enabled:focus span,
