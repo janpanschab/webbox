@@ -67,12 +67,7 @@ z-indexes
 #wb-prev { left: 0; }
 #wb-next { right: 0; }
 #wb-prev.enabled,
-#wb-next.enabled { /* fixed IE bug on hover transparent element (must have background color) */
-	background-color: #000;
-	-ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
-	filter: alpha(opacity=0);
-	background-color: rgba(0,0,0,0); /* reset for non IE browsers */
-}
+#wb-next.enabled { background: url(ie-fix.png); /* fixed IE bug on hover transparent element (must have background) */ }
 #wb-prev.enabled:hover span,
 #wb-next.enabled:hover span,
 #wb-prev.enabled:focus span,
@@ -80,7 +75,7 @@ z-indexes
 #wb-prev.enabled:active span,
 #wb-next.enabled:active span { display: block; }
 #wb-prev span,
-#wb-next span { position: absolute; padding: 0px 12px 5px; line-height: 1; }
+#wb-next span { position: absolute; z-index: 1010; padding: 0px 12px 5px; line-height: 1; }
 #wb-prev span {
 	left: -43px;
 	-moz-border-radius: 7px 0 0 7px; /* FF1-3.6 */
@@ -137,17 +132,5 @@ z-indexes
 	0% { -webkit-transform: rotate(0deg); }
 	100% { -webkit-transform: rotate(360deg); }
 }
-#wb-overlay {
-	position: fixed;
-	z-index: 1000;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-	background-color: #000;
-}
-#webbox iframe {
-	border: 0;
-	width: 100%;
-	height: 100%;
-}
+#wb-overlay { position: fixed; z-index: 1000; top: 0; left: 0; width: 100%; height: 100%; background-color: #000; }
+#webbox iframe { border: 0; width: 100%; height: 100%; }
