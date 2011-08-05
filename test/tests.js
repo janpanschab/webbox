@@ -39,7 +39,7 @@ module('click events');
 
 test('open by click on trigger', function() {
   stop();
-  expect(5);
+  expect(6);
   $('a.webbox').webbox().filter(':first').click();
   var $webbox = $('#webbox');
   
@@ -49,6 +49,7 @@ test('open by click on trigger', function() {
     ok($webbox.find('#wb-close').is(':visible'), '#wb-close is visible');
     ok($webbox.find('#wb-next').is(':visible'), '#wb-next is visible');
     ok($webbox.find('#wb-prev').is(':hidden'), '#wb-prev is hidden');
+    ok($('#wb-loader').is(':hidden'), '#wb-loader is hidden');
     
     start();
   }, timeout);

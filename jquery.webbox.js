@@ -40,7 +40,7 @@ window.log = function(){
         ANCHOR: 'anchor',
         singleOptions: ['wb-position','wb-overlay', 'wb-iframe', 'wb-width', 'wb-height'], // possible single options
         storeOptions: {},
-        loaderTimeout: {}, // for loader setTimeout
+        loaderTimeout: false, // checking loader setTimeout
         cache: [],
         group: {},
         $body: $('body'),
@@ -389,15 +389,19 @@ hideContent: function() {
   return dfd.promise();
 },
 showLoader: function() {
-  wb.loaderTimeout = setTimeout(function() {
-    wb.loader.show();
-    var dimensions = m.getDimensions(wb.loader),
-        center = m.getCenter(dimensions, true);
-    m.setCenter(wb.loader, center);
+  wb.loaderTimeout = true;
+  setTimeout(function() {
+    if (wb.loaderTimeout) {
+      wb.loader.show();
+      wb.loaderTimeout = false;
+      var dimensions = m.getDimensions(wb.loader),
+          center = m.getCenter(dimensions, true);
+      m.setCenter(wb.loader, center);
+    }
   }, o.loaderDelay);
 },
 hideLoader: function() {
-  clearTimeout(wb.loaderTimeout);
+  wb.loaderTimeout = false;
   wb.loader.hide();
 },
 tabNavigation: function(e) {
@@ -452,7 +456,8 @@ unbindShortcuts: function() {
   wb.$document.unbind('keydown.wb');
 },
 setListing: function() {
-  wb.group.name = wb.trigger.data('wbGroup') || false;
+  // jQuery > 1.6 || jQuery < 1.6 || false
+  wb.group.name = wb.trigger.data('wbGroup') || wb.trigger.data('wb-group') || false;
   if (wb.group.name) {
     wb.group.triggers = $(wb.self.selector +'[data-wb-group='+ wb.group.name +']');
     wb.group.index = wb.group.triggers.index(wb.trigger);
