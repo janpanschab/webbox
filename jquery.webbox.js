@@ -402,7 +402,7 @@ showLoader: function() {
   }, o.loaderDelay);
 },
 hideLoader: function() {
-  wb.trigger.css('cursor', 'default');
+  wb.trigger.css('cursor', 'pointer');
   wb.loaderTimeout = false;
   wb.loader.hide();
 },

@@ -2,7 +2,7 @@
 // example tests: https://github.com/jquery/qunit/blob/master/test/same.js
 
 $.fx.off = true;
-var timeout = 1500;
+var timeout = 2500;
 QUnit.testStart = function(name) {
   //log(name.name);
   //log($('a.webbox'));
