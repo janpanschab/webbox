@@ -389,6 +389,7 @@ hideContent: function() {
   return dfd.promise();
 },
 showLoader: function() {
+  wb.trigger.css('cursor', 'wait');
   wb.loaderTimeout = true;
   setTimeout(function() {
     if (wb.loaderTimeout) {
@@ -401,6 +402,7 @@ showLoader: function() {
   }, o.loaderDelay);
 },
 hideLoader: function() {
+  wb.trigger.css('cursor', 'default');
   wb.loaderTimeout = false;
   wb.loader.hide();
 },
