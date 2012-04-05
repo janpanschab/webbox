@@ -6,7 +6,7 @@
  *  - http://www.gnu.org/copyleft/gpl.html
  * 
  * https://github.com/janpanschab/webbox
-*/
+ */
 
 // usage: log('inside coolFunc', this, arguments);
 // paulirish.com/2009/log-a-lightweight-wrapper-for-consolelog/
@@ -76,13 +76,14 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
                 }
                 var url = wb.trigger.attr('href'),
                     dataOptions = wb.trigger.data('wb-options'),
-                    singleDataOptions = {};
+                    localDataOptions = {};
                 
+                o = wb.instance[wb.currentInstanceSelector].options;
                 if (dataOptions) { // extend options with data from wb-options
                     o = $.extend({}, o, dataOptions);
                 }
-                singleDataOptions = m.getSingleDataOptions();
-                o = $.extend({}, o, singleDataOptions); // extend options with data from single data options
+                localDataOptions = m.getlocalDataOptions();
+                o = $.extend({}, o, localDataOptions); // extend options with data from local data options
                 wb.box.css('position', 'absolute'); // box must have absolute position when is animated - fixed position (if option position fixed is set) is set after animation is finished
                 o.beforeOpen(); // call custom function before webbox is opened
                 m.showLoader();
@@ -201,22 +202,22 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
                     url: url, 
                     type: 'GET'
                 }))
-                .done(function(data) {
-                    m.contentDone(data);
-                })
-                .fail(function(jqXHR, textStatus, errorThrown) {
-                    m.hideLoader();
-                    $.error('Error '+ jqXHR.status +' '+ errorThrown +' while loading '+ url);
-                });
+                    .done(function(data) {
+                        m.contentDone(data);
+                    })
+                    .fail(function(jqXHR, textStatus, errorThrown) {
+                        m.hideLoader();
+                        $.error('Error '+ jqXHR.status +' '+ errorThrown +' while loading '+ url);
+                    });
             } else if (wb.contentType === wb.IFRAME) {
                 $.when(m.loadIframe(url))
-                .done(function() {
-                    m.contentDone();
-                })
-                .fail(function() {
-                    m.hideLoader();
-                    $.error('Error while loading '+ url);
-                });
+                    .done(function() {
+                        m.contentDone();
+                    })
+                    .fail(function() {
+                        m.hideLoader();
+                        $.error('Error while loading '+ url);
+                    });
             } else if (wb.contentType === wb.ANCHOR) {
                 // if element with id url exist (id="[url]")
                 if ($(url).length) {
@@ -410,7 +411,9 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
             return dfd.promise();
         },
         showLoader: function() {
-            wb.trigger.css('cursor', 'wait');
+            if (wb.trigger) {
+                wb.trigger.css('cursor', 'wait');
+            }
             wb.loaderTimeout = true;
             setTimeout(function() {
                 if (wb.loaderTimeout) {
@@ -425,7 +428,9 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
             }, o.loaderDelay);
         },
         hideLoader: function() {
-            wb.trigger.css('cursor', 'pointer');
+            if (wb.trigger) {
+                wb.trigger.css('cursor', 'pointer');
+            }
             wb.loaderTimeout = false;
             wb.loader.hide();
         },
@@ -526,18 +531,18 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
         disable: function($el) {
             $el.removeClass('enabled').addClass('disabled').attr('aria-disabled', true).hide();
         },
-        getSingleDataOptions: function() {
-            var SDO = [];
+        getlocalDataOptions: function() {
+            var LDO = [];
             
             $.each(wb.singleOptions, function(i, val) {
                 var dataO = wb.trigger.data(val),
                 key = val.replace('wb-', '');
                 if (dataO !== undefined) {
-                    SDO[key] = dataO;
+                    LDO[key] = dataO;
                 }
             });
             
-            return SDO;
+            return LDO;
         },
         getContentType: function(url) {
             var type = wb.AJAX;
@@ -590,8 +595,12 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
             wb.prev.add(wb.next).bind('click.wb', function(e) {
                 var showIndex = this === wb.prev.get(0) ? wb.group.index - 1 : wb.group.index + 1;
                 
-                o = wb.instance[wb.currentInstanceSelector].options;
-                m.show(showIndex);
+                if (showIndex >= 0 && showIndex < wb.group.size) {
+                    o = wb.instance[wb.currentInstanceSelector].options;
+                    m.show(showIndex);
+                } else {
+                    $.error('Unknown index '+ showIndex +' in group '+ wb.group.name);
+                }
             });
         },
         bindOpen: function() {
@@ -678,11 +687,11 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
   
         // Method calling logic
         if ( m[method] ) {
-            return m[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
-        } else if ( typeof method === 'object' || ! method ) {
-            return m.init.apply( this, arguments );
+            return m[method].apply(this, Array.prototype.slice.call(arguments, 1));
+        } else if (typeof method === 'object' || !method) {
+            return m.init.apply(this, arguments);
         } else {
-            $.error('Method ' +  method + ' does not exist on jQuery webbox plugin');
+            $.error('Method '+  method +' does not exist on jQuery webbox plugin');
         }
     
     };

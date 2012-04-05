@@ -1,83 +1,85 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Webbox demo</title>
-  <meta charset="utf-8" />
-  <link href="../jquery.webbox.css" rel="stylesheet" />
-</head>
-<body>
-  
-  <p id="global">
-    <button data-run="destroy">destroy</button>
-    <button data-run="init">init</button>
-    <button data-run="showLoader">show loader</button>
-    <button data-run="hideLoader">hide loader</button>
-  </p>
-  <p id="first">
-    execute on first image
-    <button data-run="open">open</button>
-    <button data-run="close" style="position: relative; z-index: 1010;">close</button>
-    <button data-run="next" style="position: relative; z-index: 1010;">next</button>
-    <button data-run="prev" style="position: relative; z-index: 1010;">previous</button>
-  </p>
-  <p>
-    <button id="open-second">open second image</button>
-    <button id="add-image">add image</button>
-  </p>
-  
-  <p>
-    <a href="content/content.html">open content.html</a>
-    <a href="http://www.google.com" data-wb-options='{"iframe":true, "width":900, "position": "fixed"}'>open google.com</a>
-    <a href="#content">open anchor #content</a>
-    <div id="content" style="display: none;">
-      <h3>Anchor</h3>
-      <p>Aenean at metus dolor, ac vehicula libero. Curabitur mattis purus vitae dui aliquet ac sagittis eros vestibulum. Aliquam non ante lectus. Nunc tristique risus eget enim semper eleifend. Nunc id elit metus, vitae euismod dui. Curabitur nec risus erat, ut molestie erat? Sed facilisis felis sit amet lorem tristique in luctus quam volutpat. In eget enim elit, sed elementum purus! Cras ullamcorper magna malesuada nibh vehicula at tempus arcu vestibulum. Sed a tellus in mi mollis varius. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas rhoncus mattis nulla; at sagittis est tincidunt quis. Vivamus et tortor leo, at gravida mauris. Sed eu mi&nbsp;dolor.</p>
-    </div>
-  </p>
-  <a href="img/61.jpg" data-wb-group="gallery" data-wb-options='{"title":"Dlouhý popis fotky hoodně moc. Lorem ipsum dolor sit amet. Praesent ac nisi lacus? Proin ut metus vel enim imperdiet congue eu id dolor. Ut dictum velit metus. <strong>Donec in eros nec sem ultricies adipiscing.</strong> Sed non tortor neque, at dapibus justo. Mauris condimentum neque eu libero ornare a faucibus quam rhoncus. <em>Donec a felis metus, dignissim ultrices metus.</em> Nunc condimentum feugiat sem vitae egestas."}'><img src="img/61_nahled.jpg" alt="image" width="180" height="101" /></a><br /><br /><br /><br />
-  <a href="img/63.jpg" data-wb-group="gallery" data-wb-position="fixed" title="Popis fotografie"><img src="img/63_nahled.jpg" alt="image" width="168" height="120" /></a><br /><br /><br /><br />
-  <a href="img/64.png" data-wb-options='{"overlay":false}'><img src="img/64_nahled.png" alt="image" width="180" height="59" /></a><br /><br /><br /><br />
-  <a href="img/IMG_8868.jpg" data-wb-group="gallery" data-wb-options='{"closeOnOverlayClick":false}'><img src="img/IMG_8868_nahled.jpg" alt="image" width="200" height="113" /></a><br /><br /><br /><br />
-  <a href="img/66.gif" data-wb-group="gallery"><img src="img/66_nahled.gif" alt="image" width="180" height="32" /></a><br /><br /><br /><br />
-  <a href="img/63.jpg" id="instance1" title="Instance 1"><img src="img/63_nahled.jpg" alt="image" width="168" height="120" /></a><br /><br /><br /><br />
-  <a href="img/64.png" id="instance2" title="Instance 2"><img src="img/64_nahled.png" alt="image" width="180" height="59" /></a><br /><br /><br /><br />
+    <head>
+        <title>Webbox demo</title>
+        <meta charset="utf-8" />
+        <link href="../jquery.webbox.css" rel="stylesheet" />
+    </head>
+    <body>
 
-  <script src="js/jquery-1.6.2.min.js"></script>
-<!--  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>-->
-  <script src="../jquery.webbox.js"></script>
-  <script>
-    $(function() {
-      $('a').webbox({
-//        beforeOpen: function() { alert('beforeOpen') },
-//        open: function() { alert('open') },
-//        beforeClose: function() { alert('beforeClose') },
-//        close: function() { alert('close') }
-      });
-      
-      $('[data-run]', '#global').click(function() {
-        $('a').webbox($(this).data('run'));
-      });
-      
-      $('[data-run]', '#first').click(function() {
-        $('a:first').webbox($(this).data('run'));
-      });
-      
-      $('#open-second').click(function() {
-        $('a').webbox('open', $('a:eq(1)'));
-      });
-      
-      $('#add-image').click(function() {
-        $('body').prepend('<a href="img/IMG_4829.JPG" data-wb-group="gallery"><img src="img/IMG_4829_nahled.jpg" /></a>');
-      });
-      
-      $('#instance1').webbox({
-          overlayOpacity: 0.5
-      });
-      $('#instance2').webbox({
-          overlayOpacity: 0.75
-      });
-    });
-  </script>
+        <p id="global">
+            <button data-run="destroy">destroy</button>
+            <button data-run="init">init</button>
+            <button data-run="showLoader">show loader</button>
+            <button data-run="hideLoader">hide loader</button>
+        </p>
+        <p id="first">
+            execute on first image
+            <button data-run="open">open</button>
+            <button data-run="close" style="position: relative; z-index: 1010;">close</button>
+            <button data-run="next" style="position: relative; z-index: 1010;">next</button>
+            <button data-run="prev" style="position: relative; z-index: 1010;">previous</button>
+        </p>
+        <p>
+            <button id="open-second">open second image</button>
+            <button id="add-image">add image</button>
+        </p>
 
-</body>
+        <p>
+            <a href="../media/content/content.html">open content.html</a>
+            <a href="http://dowebsitesneedtolookexactlythesameineverybrowser.com/" data-wb-options='{"iframe":true, "width":900, "position": "fixed"}'>open dowebsitesneedtolookexactlythesameineverybrowser.com</a>
+            <a href="#content">open anchor #content</a>
+        </p>
+        <div id="content" style="display: none;">
+            <h3>Anchor</h3>
+            <p>Aenean at metus dolor, ac vehicula libero. Curabitur mattis purus vitae dui aliquet ac sagittis eros vestibulum. Aliquam non ante lectus. Nunc tristique risus eget enim semper eleifend. Nunc id elit metus, vitae euismod dui. Curabitur nec risus erat, ut molestie erat? Sed facilisis felis sit amet lorem tristique in luctus quam volutpat. In eget enim elit, sed elementum purus! Cras ullamcorper magna malesuada nibh vehicula at tempus arcu vestibulum. Sed a tellus in mi mollis varius. Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas rhoncus mattis nulla; at sagittis est tincidunt quis. Vivamus et tortor leo, at gravida mauris. Sed eu mi&nbsp;dolor.</p>
+        </div>
+        <a href="../media/img/martin-janecky01.jpg" data-wb-group="gallery" data-wb-options='{"title":"Long description with HTML. Aenean at metus dolor, ac vehicula libero. Curabitur <em>mattis purus vitae</em> dui aliquet ac sagittis eros vestibulum. <strong>Aliquam non ante lectus.</strong> Nunc tristique risus eget enim semper eleifend."}'>
+            <img src="../media/img/min/martin-janecky01.jpg" alt="martin-janecky01.jpg" />
+        </a>
+        <br /><br /><br /><br />
+        <a href="../media/img/martin-janecky02.jpg" data-wb-group="gallery" data-wb-position="fixed" title="Short description">
+            <img src="../media/img/min/martin-janecky02.jpg" alt="martin-janecky02.jpg" />
+        </a>
+        <br /><br /><br /><br />
+        <a href="../media/img/martin-janecky03.jpg" data-wb-options='{"overlay":false}'>
+            <img src="../media/img/min/martin-janecky03.jpg" alt="martin-janecky03.jpg" />
+        </a>
+        <br /><br /><br /><br />
+        <a href="../media/img/martin-janecky04.jpg" data-wb-group="gallery" data-wb-options='{"closeOnOverlayClick":false}'>
+            <img src="../media/img/min/martin-janecky04.jpg" alt="martin-janecky04.jpg" />
+        </a>
+
+        <script src="../lib/jquery-1.7.2.min.js"></script>
+        <!--  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.2/jquery.min.js"></script>-->
+        <!--  <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>-->
+        <script src="../jquery.webbox.js"></script>
+        <script>
+            $(function() {
+                $('a').webbox({
+                    //        beforeOpen: function() { alert('beforeOpen') },
+                    //        open: function() { alert('open') },
+                    //        beforeClose: function() { alert('beforeClose') },
+                    //        close: function() { alert('close') }
+                });
+      
+                $('[data-run]', '#global').click(function() {
+                    $('a').webbox($(this).data('run'));
+                });
+      
+                $('[data-run]', '#first').click(function() {
+                    $('a:has(img):first').webbox($(this).data('run'));
+                });
+      
+                $('#open-second').click(function() {
+                    $('a').webbox('open', $('a:has(img):eq(1)'));
+                });
+      
+                $('#add-image').click(function() {
+                    $('body').prepend('<a href="../media/img/martin-janecky05.jpg" data-wb-group="gallery"><img src="../media/img/min/martin-janecky05.jpg" /></a>');
+                });
+            });
+        </script>
+
+    </body>
 </html>
