@@ -1,5 +1,5 @@
-/*
- * jQuery Webbox Plugin - 1.0, 2011/8/1
+/**
+ * jQuery Webbox Plugin - 1.0.0, 2012/4/5
  * Copyright (c) 2011, Jan Panschab
  * Dual licensed under the MIT or GPL Version 2 licenses.
  *  - http://www.opensource.org/licenses/mit-license.php
