@@ -97,11 +97,11 @@ z-indexes
 	-ms-filter:"progid:DXImageTransform.Microsoft.Alpha(Opacity=75)";
 	filter: alpha(opacity=75);
 	background-color: rgba(0, 0, 0, 0.75);
-	color: #fff;
 	font-size: 12px;
 	line-height: 1.5;
 }
 #wb-title div { padding: 10px; }
+#wb-title * { color: #fff; }
 #wb-loader {
 	position: fixed;
 	z-index: 1005;

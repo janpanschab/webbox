@@ -38,7 +38,7 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
         AJAX: 'ajax',
         IFRAME: 'iframe',
         ANCHOR: 'anchor',
-        singleOptions: ['wb-position','wb-overlay', 'wb-iframe', 'wb-width', 'wb-height'], // possible single options
+        singleOptions: ['wb-position','wb-overlay', 'wb-iframe', 'wb-width', 'wb-height', 'wb-title'], // possible single options
         instance: {},
         isCreated: false,
         isOpen: false,
@@ -604,7 +604,7 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
             });
         },
         bindOpen: function() {
-            wb.$body.delegate(wb.currentInstanceSelector +':not(#wb-close, #wb-prev, #wb-next)', 'click.wb', { selector: wb.currentInstanceSelector }, function(e) {
+            wb.$body.delegate(wb.currentInstanceSelector +':not(#wb-close, #wb-prev, #wb-next, #wb-title *)', 'click.wb', { selector: wb.currentInstanceSelector }, function(e) {
                 e.preventDefault();
                 
                 wb.currentInstanceSelector = e.data.selector;
