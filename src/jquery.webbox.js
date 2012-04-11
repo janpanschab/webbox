@@ -193,7 +193,8 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
                 })
                 .fail(function() {
                     m.hideLoader();
-                    $.error('Error loading image '+ url);
+                    wb.isOpen = false;
+                    console.warn('Error loading image '+ url);
                 });
         },
         openContent: function(url) {
