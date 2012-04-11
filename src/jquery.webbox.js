@@ -208,7 +208,7 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
                     })
                     .fail(function(jqXHR, textStatus, errorThrown) {
                         m.hideLoader();
-                        $.error('Error '+ jqXHR.status +' '+ errorThrown +' while loading '+ url);
+                        console.warn('Error '+ jqXHR.status +' '+ errorThrown +' while loading '+ url);
                     });
             } else if (wb.contentType === wb.IFRAME) {
                 $.when(m.loadIframe(url))
@@ -217,14 +217,14 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
                     })
                     .fail(function() {
                         m.hideLoader();
-                        $.error('Error while loading '+ url);
+                        console.warn('Error while loading '+ url);
                     });
             } else if (wb.contentType === wb.ANCHOR) {
                 // if element with id url exist (id="[url]")
                 if ($(url).length) {
                     m.contentDone($(url).children());
                 } else {
-                    $.error('Can\'t find anchor '+ url);
+                    console.warn('Can\'t find anchor '+ url);
                 }
             }
         },
@@ -600,7 +600,7 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
                     o = wb.instance[wb.currentInstanceSelector].options;
                     m.show(showIndex);
                 } else {
-                    $.error('Unknown index '+ showIndex +' in group '+ wb.group.name);
+                    console.warn('Unknown index '+ showIndex +' in group '+ wb.group.name);
                 }
             });
         },
@@ -692,7 +692,7 @@ window.log = function f(){ log.history = log.history || []; log.history.push(arg
         } else if (typeof method === 'object' || !method) {
             return m.init.apply(this, arguments);
         } else {
-            $.error('Method '+  method +' does not exist on jQuery webbox plugin');
+            console.warn('Method '+  method +' does not exist on jQuery webbox plugin');
         }
     
     };
