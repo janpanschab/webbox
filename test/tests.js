@@ -2,12 +2,12 @@
 // example tests: https://github.com/jquery/qunit/blob/master/test/same.js
 
 $.fx.off = true;
-var timeout = 1000;
+var timeout = 500;
 //QUnit.testStart = function(name) {
 //    log(name.name);
 //};
 QUnit.testDone = function(name) {
-    $('#img a').webbox('destroy');
+    $('body').webbox('destroy');
 };
 
 module('core');
@@ -32,9 +32,9 @@ test('create', function() {
 test('destroy', function() {
     expect(3);
     $('#img a').webbox().webbox('destroy');
-    equal($('#webbox').length, false, '#webbox doesnt exist');
-    equal($('#wb-overlay').length, false, '#wb-overlay doesnt exist');
-    equal($('#wb-loader').length, false, '#wb-loader doesnt exist');
+    equal($('#webbox').length, 0, '#webbox doesnt exist');
+    equal($('#wb-overlay').length, 0, '#wb-overlay doesnt exist');
+    equal($('#wb-loader').length, 0, '#wb-loader doesnt exist');
 });
 
 module('click events');
@@ -405,10 +405,27 @@ test('close', function() {
     $('#content a').webbox('open', $('#content a:eq(0)'));
   
     setTimeout(function() {
-        $('#img a').webbox('close');
+        $('#content a').webbox('close');
         setTimeout(function() {
             ok($webbox.is(':hidden'), '#webbox is hidden');
             equal($webbox.find('#wb-content').hasClass('wb-content'), false, '#wb-content has not class wb-content');
+
+            start();
+        }, timeout);
+    }, timeout);
+});
+
+test('open non-existing url and open another', function() {
+    stop();
+    expect(2);
+    $('#content a').webbox().webbox('open', $('#content a:eq(3)'));
+    var $webbox = $('#webbox');
+    
+    setTimeout(function() {
+        ok($webbox.is(':hidden'), '#webbox is hidden');
+        $('#content a').webbox('open', $('#content a:eq(0)'));
+        setTimeout(function() {
+            ok($webbox.is(':visible'), '#webbox is visible');
 
             start();
         }, timeout);
