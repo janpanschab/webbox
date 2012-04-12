@@ -7,7 +7,7 @@ var timeout = 500;
 //    log(name.name);
 //};
 QUnit.testDone = function(name) {
-    $('#img a').webbox('destroy');
+    $('body').webbox('destroy');
 };
 
 module('core');
